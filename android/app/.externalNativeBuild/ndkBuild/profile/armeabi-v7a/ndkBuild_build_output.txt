@@ -1,0 +1,11 @@
+Android NDK: OpenCV: You should ignore warning about 'non-system libraries in linker flags' and 'opencv_java' library.    
+Android NDK:         'OPENCV_INSTALL_MODULES:=on' can be used to build APK with included OpenCV binaries    
+rm -f /home/jayanthl/projs/aiphotoapp/bokehfyapp/build/app/intermediates/ndkBuild/profile/lib/armeabi-v7a/*
+rm -f /home/jayanthl/projs/aiphotoapp/bokehfyapp/build/app/intermediates/ndkBuild/profile/lib/armeabi-v7a/gdbserver
+rm -f /home/jayanthl/projs/aiphotoapp/bokehfyapp/build/app/intermediates/ndkBuild/profile/lib/armeabi-v7a/gdb.setup
+mkdir -p /home/jayanthl/projs/aiphotoapp/bokehfyapp/build/app/intermediates/ndkBuild/profile/lib/armeabi-v7a
+echo [armeabi-v7a] "Gdbserver      ": "[arm-linux-androideabi] /home/jayanthl/projs/aiphotoapp/bokehfyapp/build/app/intermediates/ndkBuild/profile/lib/armeabi-v7a/gdbserver"
+install -p /home/jayanthl/Android/android-ndk-r18b/prebuilt/android-arm/gdbserver/gdbserver /home/jayanthl/projs/aiphotoapp/bokehfyapp/build/app/intermediates/ndkBuild/profile/lib/armeabi-v7a/gdbserver
+echo [armeabi-v7a] "Gdbsetup       ": "/home/jayanthl/projs/aiphotoapp/bokehfyapp/build/app/intermediates/ndkBuild/profile/lib/armeabi-v7a/gdb.setup"
+echo "set solib-search-path /home/jayanthl/projs/aiphotoapp/bokehfyapp/build/app/intermediates/ndkBuild/profile/obj/local/armeabi-v7a" > /home/jayanthl/projs/aiphotoapp/bokehfyapp/build/app/intermediates/ndkBuild/profile/lib/armeabi-v7a/gdb.setup
+echo "directory /home/jayanthl/Android/android-ndk-r18b/sysroot /home/jayanthl/Android/android-ndk-r18b/sources/cxx-stl/system" >> /home/jayanthl/projs/aiphotoapp/bokehfyapp/build/app/intermediates/ndkBuild/profile/lib/armeabi-v7a/gdb.setup

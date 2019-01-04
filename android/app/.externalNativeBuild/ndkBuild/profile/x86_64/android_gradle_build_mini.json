@@ -1,0 +1,7 @@
+{
+  "buildFiles": [
+    "/home/jayanthl/.opencv_java/opencv-4.0.1-android-sdk/OpenCV-android-sdk/sdk/native/jni/OpenCV.mk"
+  ],
+  "cleanCommands": [],
+  "libraries": {}
+}

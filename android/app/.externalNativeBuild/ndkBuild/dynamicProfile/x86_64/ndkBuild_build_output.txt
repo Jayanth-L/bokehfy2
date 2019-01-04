@@ -1,0 +1,11 @@
+Android NDK: OpenCV: You should ignore warning about 'non-system libraries in linker flags' and 'opencv_java' library.    
+Android NDK:         'OPENCV_INSTALL_MODULES:=on' can be used to build APK with included OpenCV binaries    
+rm -f /home/jayanthl/projs/aiphotoapp/bokehfyapp/build/app/intermediates/ndkBuild/dynamicProfile/lib/x86_64/*
+rm -f /home/jayanthl/projs/aiphotoapp/bokehfyapp/build/app/intermediates/ndkBuild/dynamicProfile/lib/x86_64/gdbserver
+rm -f /home/jayanthl/projs/aiphotoapp/bokehfyapp/build/app/intermediates/ndkBuild/dynamicProfile/lib/x86_64/gdb.setup
+mkdir -p /home/jayanthl/projs/aiphotoapp/bokehfyapp/build/app/intermediates/ndkBuild/dynamicProfile/lib/x86_64
+echo [x86_64] "Gdbserver      ": "[x86_64-linux-android] /home/jayanthl/projs/aiphotoapp/bokehfyapp/build/app/intermediates/ndkBuild/dynamicProfile/lib/x86_64/gdbserver"
+install -p /home/jayanthl/Android/android-ndk-r18b/prebuilt/android-x86_64/gdbserver/gdbserver /home/jayanthl/projs/aiphotoapp/bokehfyapp/build/app/intermediates/ndkBuild/dynamicProfile/lib/x86_64/gdbserver
+echo [x86_64] "Gdbsetup       ": "/home/jayanthl/projs/aiphotoapp/bokehfyapp/build/app/intermediates/ndkBuild/dynamicProfile/lib/x86_64/gdb.setup"
+echo "set solib-search-path /home/jayanthl/projs/aiphotoapp/bokehfyapp/build/app/intermediates/ndkBuild/dynamicProfile/obj/local/x86_64" > /home/jayanthl/projs/aiphotoapp/bokehfyapp/build/app/intermediates/ndkBuild/dynamicProfile/lib/x86_64/gdb.setup
+echo "directory /home/jayanthl/Android/android-ndk-r18b/sysroot /home/jayanthl/Android/android-ndk-r18b/sources/cxx-stl/system" >> /home/jayanthl/projs/aiphotoapp/bokehfyapp/build/app/intermediates/ndkBuild/dynamicProfile/lib/x86_64/gdb.setup

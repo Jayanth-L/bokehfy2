@@ -1,0 +1,16 @@
+Executable : /home/jayanthl/Android/android-ndk-r18b/ndk-build
+arguments : 
+NDK_PROJECT_PATH=null
+APP_BUILD_SCRIPT=/home/jayanthl/.opencv_java/opencv-4.0.1-android-sdk/OpenCV-android-sdk/sdk/native/jni/OpenCV.mk
+APP_ABI=armeabi-v7a
+NDK_ALL_ABIS=armeabi-v7a
+NDK_DEBUG=0
+APP_PLATFORM=android-21
+NDK_OUT=/home/jayanthl/projs/aiphotoapp/bokehfyapp/build/app/intermediates/ndkBuild/release/obj
+NDK_LIBS_OUT=/home/jayanthl/projs/aiphotoapp/bokehfyapp/build/app/intermediates/ndkBuild/release/lib
+APP_SHORT_COMMANDS=false
+LOCAL_SHORT_COMMANDS=false
+-B
+-n
+jvmArgs : 
+
