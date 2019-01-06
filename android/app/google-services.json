@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "667376695987",
+    "firebase_url": "https://bokehfyapp.firebaseio.com",
+    "project_id": "bokehfyapp",
+    "storage_bucket": "bokehfyapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:667376695987:android:db81b88d54403585",
+        "android_client_info": {
+          "package_name": "com.aiportraitapp.jayanthl.bokehfyapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "667376695987-5ttcaluf8fr4k52vjuvnuaqh7vmbmgtv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.aiportraitapp.jayanthl.bokehfyapp",
+            "certificate_hash": "b3631c4edc4cbc2c0cbe774edc7554daa406cda0"
+          }
+        },
+        {
+          "client_id": "667376695987-tpgg1r3fmm5en9n0l8tdp7pkfrk7juq6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDyP7dovZjC_5X3-GIWeLiDN1Yt580Gizg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "667376695987-tpgg1r3fmm5en9n0l8tdp7pkfrk7juq6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

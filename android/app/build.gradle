@@ -69,6 +69,12 @@ android {
             path file('../../../../../.opencv_java/opencv-4.0.1-android-sdk/OpenCV-android-sdk/sdk/native/jni/OpenCV.mk')
         }
     }
+
+    aaptOptions {
+        noCompress "tflite"  // Your model's file extension: "tflite", "lite", etc.
+        noCompress "enc"
+        noCompress "tflite.enc"
+    }
 }
 
 flutter {
@@ -81,4 +87,9 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation project(':openCV401')
+
+    implementation 'org.tensorflow:tensorflow-lite:+'
+
 }
+
+apply plugin: 'com.google.gms.google-services'

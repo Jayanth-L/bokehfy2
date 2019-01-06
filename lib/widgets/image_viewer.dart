@@ -25,6 +25,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
     var image = <PhotoViewGalleryPageOptions>[];
 
     return Scaffold(
+      backgroundColor: Colors.black,
         body: FutureBuilder(
       future: _getBokehImages(),
       builder: (BuildContext context, AsyncSnapshot asyncshapshot) {
@@ -50,7 +51,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
 
   Future<List> _getBokehImages() async {
     bokehImagesList =
-        await platform.invokeMethod("getBokehImages", {"images": "images"});
+        await platform.invokeMethod("getBokehImagesCamera", {"images": "images"});
     return bokehImagesList;
   }
 }
