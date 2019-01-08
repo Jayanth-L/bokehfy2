@@ -195,9 +195,28 @@ class ChromePortraitPageClass {
 
   // Platform channels methods.
 
-  // GetImages list
-  Future<List> _getBokehImages() async {
-    bokehImagesList = await platform.invokeMethod("getBokehImages", {"images": "images"});
-    return bokehImagesList;
+  // Function to get the imagepath
+  Future<String> _getImageToPortrait() async {
+    var response = await platform
+        .invokeMethod("getImagepathToChromePortrait", {"images": "images"});
+    return response;
+  }
+
+  Future<String> _getCameraImageToPortraitAndPortrify() async {
+    var response = await platform.invokeMethod(
+        "getCameraImagepathToPortraitAndChromify", {"imagepath": "images"});
+    return response;
+  }
+
+  Future<String> _sendImageForBokehfycation(String imagepath) async {
+    var response = await platform
+        .invokeMethod("sendImageForchromifycation", {"imagepath": imagepath});
+    return response;
+  }
+
+  Future<String> _sendCameraImageForBokehfycation(String imagepath) async {
+    var response = await platform.invokeMethod(
+        "sendCameraImageForChromification", {"imagepath": imagepath});
+    return response;
   }
 }

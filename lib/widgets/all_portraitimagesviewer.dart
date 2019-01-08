@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 
-class ImageViewPage extends StatefulWidget {
+class AllPortraitImagesViewpage extends StatefulWidget {
   @override
-  _ImageViewPageState createState() => _ImageViewPageState();
+  _AllPortraitImagesViewpageState createState() => _AllPortraitImagesViewpageState();
 }
 
-class _ImageViewPageState extends State<ImageViewPage> {
+class _AllPortraitImagesViewpageState extends State<AllPortraitImagesViewpage> {
   static final platform = MethodChannel("BokehfyImage");
   List bokehImagesList = [];
   var image = <PhotoViewGalleryPageOptions>[];
@@ -27,7 +27,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
     return Scaffold(
       backgroundColor: Colors.black,
         body: FutureBuilder(
-      future: _getBokehImages(),
+      future: _getAllImagesToPortrait(),
       builder: (BuildContext context, AsyncSnapshot asyncshapshot) {
         var opt = <PhotoViewGalleryPageOptions>[];
         if (bokehImagesList.length > 0) {
@@ -49,9 +49,8 @@ class _ImageViewPageState extends State<ImageViewPage> {
     ));
   }
 
-  Future<List> _getBokehImages() async {
-    bokehImagesList =
-        await platform.invokeMethod("getBokehImages", {"images": "images"});
+  Future<List> _getAllImagesToPortrait() async {
+    bokehImagesList = await platform.invokeMethod("getAllPortraitImages", {"images": "images"});
     return bokehImagesList;
   }
 }

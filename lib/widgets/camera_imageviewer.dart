@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 
-class ImageViewPage extends StatefulWidget {
+class CameraImageViewPage extends StatefulWidget {
   @override
-  _ImageViewPageState createState() => _ImageViewPageState();
+  _CameraImageViewPageState createState() => _CameraImageViewPageState();
 }
 
-class _ImageViewPageState extends State<ImageViewPage> {
+class _CameraImageViewPageState extends State<CameraImageViewPage> {
   static final platform = MethodChannel("BokehfyImage");
   List bokehImagesList = [];
   var image = <PhotoViewGalleryPageOptions>[];
@@ -51,7 +51,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
 
   Future<List> _getBokehImages() async {
     bokehImagesList =
-        await platform.invokeMethod("getBokehImages", {"images": "images"});
+        await platform.invokeMethod("getBokehImagesCamera", {"images": "images"});
     return bokehImagesList;
   }
 }

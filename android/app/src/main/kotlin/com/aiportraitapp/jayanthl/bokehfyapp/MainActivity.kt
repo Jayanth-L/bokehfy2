@@ -12,6 +12,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.support.v4.content.FileProvider
 import android.util.Log
 import android.widget.Toast
 
@@ -40,9 +41,12 @@ import javax.crypto.Cipher
 import javax.crypto.CipherInputStream
 import javax.crypto.spec.SecretKeySpec
 import javax.xml.transform.Result
+import kotlin.collections.ArrayList
 import kotlin.math.max
 
 class MainActivity: FlutterActivity() {
+
+    var mCurrentPhotoPath: String = ""
 
     val PICK_IMAGE_FOR_PORTRAIT_REQUESTCODE = 101
     val PICK_CAMERA_IMAGE_FOR_PORTRAIT_REQUESTCODE = 102
@@ -127,14 +131,41 @@ class MainActivity: FlutterActivity() {
         // Platform channel starts
         MethodChannel(flutterView, CHANNEL_BOKEHFY).setMethodCallHandler {methodCall, result ->
             val arguments: Map<String, ObjectInput> = methodCall.arguments()
-            if(methodCall.method.equals("getBokehImagesCamera")) {
+
+            if(methodCall.method.equals("getBokehImages")) {
                 val bokehImagesList:  ArrayList<String> = arrayListOf()
                 File(Environment.getExternalStorageDirectory().toString() + "/Bokehfy/Portrait/Images/").walk().forEach {
                     bokehImagesList.add(it.toString())
                 }
                 bokehImagesList.removeAt(0)
                 result.success(bokehImagesList)
-            } else if(methodCall.method.equals("getImagepathToPortrait")) {
+            }
+            else if(methodCall.method.equals("getBokehImagesCamera")) {
+                val bokehImagesList:  ArrayList<String> = arrayListOf()
+                File(Environment.getExternalStorageDirectory().toString() + "/Bokehfy/Portrait/Camera/").walk().forEach {
+                    bokehImagesList.add(it.toString())
+                }
+                bokehImagesList.removeAt(0)
+                result.success(bokehImagesList)
+            }
+            else if(methodCall.method.equals("getAllPortraitImages")) {
+                val bokehImagesList:  ArrayList<String> = arrayListOf()
+                val bokehImageList2: ArrayList<String> = arrayListOf()
+                File(Environment.getExternalStorageDirectory().toString() + "/Bokehfy/Portrait/Images/").walk().forEach {
+                    bokehImagesList.add(it.toString())
+                }
+                var count = 0
+                File(Environment.getExternalStorageDirectory().toString() + "/Bokehfy/Portrait/Camera/").walk().forEach {
+                    bokehImageList2.add(it.toString())
+                }
+                bokehImageList2.removeAt(0)
+                bokehImagesList.removeAt(0)
+
+
+                result.success(bokehImageList2 + bokehImagesList)
+            }
+
+            else if(methodCall.method.equals("getImagepathToPortrait")) {
                 this.pendingIntentnResult = result
                 val pickImageIntent = Intent(Intent.ACTION_GET_CONTENT)
                 pickImageIntent.type = "image/*"
@@ -143,8 +174,25 @@ class MainActivity: FlutterActivity() {
             } else if(methodCall.method.equals("getCameraImagepathToPortraitAndPortrify")) {
                 this.pendingIntentnResult = result
                 Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
+                    // Ensure that there's a camera activity to handle the intent
                     takePictureIntent.resolveActivity(packageManager)?.also {
-                        startActivityForResult(takePictureIntent, PICK_CAMERA_IMAGE_FOR_PORTRAIT_REQUESTCODE)
+                        // Create the File where the photo should go
+                        val photoFile: File? = try {
+                            createImageFile()
+                        } catch (ex: IOException) {
+                            // Error occurred while creating the File
+                            null
+                        }
+                        // Continue only if the File was successfully created
+                        photoFile?.also {
+                            val photoURI: Uri = FileProvider.getUriForFile(
+                                    this,
+                                    this.applicationContext.packageName + ".com.aiportraitapp.jayanthl.bokehfyapp.provider",
+                                    it
+                            )
+                            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+                            startActivityForResult(takePictureIntent, PICK_CAMERA_IMAGE_FOR_PORTRAIT_REQUESTCODE)
+                        }
                     }
                 }
             }
@@ -159,73 +207,7 @@ class MainActivity: FlutterActivity() {
 
                     val imagepath = arguments.get("imagepath").toString()
 
-                    var image = Imgcodecs.imread(imagepath)
-                    image = resizematrix(image)
-
-                    Log.i("PaddingOffset", "width: ${image.width()} and height: ${image.height()}")
-
-                    if(image.width() < image.height()) {
-                        this.paddingOffset = image.height() - image.width()
-                        image = paddImage(image, true)
-                        isPortrait = "true"
-                    } else {
-                        this.paddingOffset = image.width() - image.height()
-                        image = paddImage(image, false)
-                        isPortrait = "false"
-                    }
-
-                    val interpreterBitmap: Bitmap = Bitmap.createBitmap(RESIZE_SIZE, RESIZE_SIZE, Bitmap.Config.ARGB_4444)
-                    Utils.matToBitmap(image, interpreterBitmap)
-
-                    imageByteBuffer = ByteBuffer.allocateDirect(IMAGE_HEIGHT * IMAGE_WIDTH * 3)
-                    imageByteBuffer.order(ByteOrder.nativeOrder())
-
-                    try {
-                        tensorflowInterpreter = Interpreter(File(filesDir, "tflite_model.tflite"))
-                        Log.i("Tensorflow", "Tensorflow model loaded successfully")
-                    } catch (e: java.lang.Exception) {
-                        Log.i("Tensorflow", "Error loading Tflite model")
-                    }
-
-                    convertBitmapToFloatArray(interpreterBitmap)
-                    tensorflowInterpreter.run(floatArray, resultData)
-
-                    resultData.rewind()
-
-                    val segmentationmask = Mat(RESIZE_SIZE, RESIZE_SIZE, CvType.CV_8UC3)
-                    for(i in 0..(RESIZE_SIZE -1)) {
-                        for(j in 0..(RESIZE_SIZE -1)) {
-                            val value = resultData.getFloat()
-                            if(value != 0.toFloat()) {
-                                segmentationmask.put(i, j, 1.0, 1.0, 1.0)
-                            } else {
-                                segmentationmask.put(i, j, 0.0, 0.0, 0.0)
-                            }
-                        }
-                    }
-
-                    val finalCroppedImage = segmentationmask.mul(image)
-
-                    // Apply blur to the original image
-                    Imgproc.GaussianBlur(image, image, Size(55.0, 55.0), 2.0)
-
-                    var finalBokehImageWithoutCrop = Mat(RESIZE_SIZE, RESIZE_SIZE, CvType.CV_8UC3)
-                    for (i in 0..(finalCroppedImage.height() -1)) {
-                        for (j in 0..(finalCroppedImage.width() -1)) {
-                            if((finalCroppedImage.get(i, j)[0] == 0.0) && (finalCroppedImage.get(i, j)[1] == 0.0) && (finalCroppedImage.get(i, j)[2] == 0.0)) {
-                                finalBokehImageWithoutCrop.put(i, j, image.get(i, j)[0], image.get(i, j)[1], image.get(i, j)[2])
-                            } else {
-                                finalBokehImageWithoutCrop.put(i, j, finalCroppedImage.get(i, j)[0], finalCroppedImage.get(i, j)[1], finalCroppedImage.get(i, j)[2])
-                            }
-                        }
-                    }
-
-                    // Unpadd the Image
-                    Log.i("PaddingOffset", this.paddingOffset.toString())
-                    val finalImage = removePaddingOfImage(finalBokehImageWithoutCrop, this.paddingOffset, isPortrait)
-
-                    Imgcodecs.imwrite(imagePortraitDirectory + Date().time.toString() + ".png", finalImage)
-                    resultData.rewind()
+                    aiConvertToPortrait(imagepath, imagePortraitDirectory)
                     return@AsyncHandler true
                 }, this, result).execute()
             }
@@ -254,98 +236,25 @@ class MainActivity: FlutterActivity() {
                 pendingIntentnResult.success("")
             }
         } else if(requestCode == PICK_CAMERA_IMAGE_FOR_PORTRAIT_REQUESTCODE && resultCode == Activity.RESULT_OK) {
-            var imageBitmap = data!!.extras.get("data") as Bitmap
-            val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
 
             try {
                 AsyncHandler({
 
-                    if(!File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).absolutePath).exists()) {
-                        File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).absolutePath).mkdir()
-                    }
-                    Log.i("SavingLocation", Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).absolutePath)
 
-                    val imageSavePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).absolutePath + "/PNG_${timeStamp}.jpg"
-                    val fos = FileOutputStream(File(imageSavePath))
-                    imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos)
-                    fos.flush()
-                    fos.close()
-
-                    var image = Imgcodecs.imread(imageSavePath)
-                    image = resizematrix(image)
-
-                    Imgcodecs.imwrite("/sdcard/temp.png", image)
-
-                    Log.i("PaddingOffset", "width: ${image.width()} and height: ${image.height()}")
-
-                    if(image.width() < image.height()) {
-                        this.paddingOffset = image.height() - image.width()
-                        image = paddImage(image, true)
-                        isPortrait = "true"
-                    } else {
-                        this.paddingOffset = image.width() - image.height()
-                        image = paddImage(image, false)
-                        isPortrait = "false"
+                    aiConvertToPortrait(mCurrentPhotoPath,  cameraPortraitDirectory)
+                    if(File(mCurrentPhotoPath).exists()) {
+                        File(mCurrentPhotoPath).delete()
                     }
 
-                    val interpreterBitmap: Bitmap = Bitmap.createBitmap(RESIZE_SIZE, RESIZE_SIZE, Bitmap.Config.ARGB_4444)
-                    Utils.matToBitmap(image, interpreterBitmap)
-
-                    imageByteBuffer = ByteBuffer.allocateDirect(IMAGE_HEIGHT * IMAGE_WIDTH * 3)
-                    imageByteBuffer.order(ByteOrder.nativeOrder())
-
-                    try {
-                        tensorflowInterpreter = Interpreter(File(filesDir, "tflite_model.tflite"))
-                        Log.i("Tensorflow", "Tensorflow model loaded successfully")
-                    } catch (e: java.lang.Exception) {
-                        Log.i("Tensorflow", "Error loading Tflite model")
-                    }
-
-                    convertBitmapToFloatArray(interpreterBitmap)
-                    tensorflowInterpreter.run(floatArray, resultData)
-
-                    resultData.rewind()
-
-                    val segmentationmask = Mat(RESIZE_SIZE, RESIZE_SIZE, CvType.CV_8UC3)
-                    for(i in 0..(RESIZE_SIZE -1)) {
-                        for(j in 0..(RESIZE_SIZE -1)) {
-                            val value = resultData.getFloat()
-                            if(value != 0.toFloat()) {
-                                segmentationmask.put(i, j, 1.0, 1.0, 1.0)
-                            } else {
-                                segmentationmask.put(i, j, 0.0, 0.0, 0.0)
-                            }
-                        }
-                    }
-
-                    val finalCroppedImage = segmentationmask.mul(image)
-
-                    // Apply blur to the original image
-                    Imgproc.GaussianBlur(image, image, Size(55.0, 55.0), 2.0)
-
-                    var finalBokehImageWithoutCrop = Mat(RESIZE_SIZE, RESIZE_SIZE, CvType.CV_8UC3)
-                    for (i in 0..(finalCroppedImage.height() -1)) {
-                        for (j in 0..(finalCroppedImage.width() -1)) {
-                            if((finalCroppedImage.get(i, j)[0] == 0.0) && (finalCroppedImage.get(i, j)[1] == 0.0) && (finalCroppedImage.get(i, j)[2] == 0.0)) {
-                                finalBokehImageWithoutCrop.put(i, j, image.get(i, j)[0], image.get(i, j)[1], image.get(i, j)[2])
-                            } else {
-                                finalBokehImageWithoutCrop.put(i, j, finalCroppedImage.get(i, j)[0], finalCroppedImage.get(i, j)[1], finalCroppedImage.get(i, j)[2])
-                            }
-                        }
-                    }
-
-                    // Unpadd the Image
-                    Log.i("PaddingOffset", this.paddingOffset.toString())
-                    val finalImage = removePaddingOfImage(finalBokehImageWithoutCrop, this.paddingOffset, isPortrait)
-
-                    Imgcodecs.imwrite(cameraPortraitDirectory + Date().time.toString() + ".png", finalImage)
-                    resultData.rewind()
                     return@AsyncHandler true
                 }, this, pendingIntentnResult).execute()
             } catch (e: java.lang.Exception) {
+                pendingIntentnResult.success("success")
                 e.printStackTrace()
             }
 
+        } else {
+            pendingIntentnResult.success("")
         }
     }
 
@@ -452,5 +361,89 @@ class MainActivity: FlutterActivity() {
             floatArray[i * 3 + 1] = (value shr 8 and 0xFF).toFloat()
             floatArray[i * 3 + 2] = (value and 0xFF).toFloat()
         }
+    }
+
+    private fun createImageFile(): File {
+        // Create an image file name
+        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val storageDir: File = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(
+                "JPEG_${timeStamp}_", /* prefix */
+                ".jpg", /* suffix */
+                storageDir /* directory */
+        ).apply {
+            // Save a file: path for use with ACTION_VIEW intents
+            mCurrentPhotoPath = absolutePath
+        }
+    }
+
+    fun aiConvertToPortrait(imagePath: String, saveDirectory: String) {
+        var image = Imgcodecs.imread(imagePath)
+        image = resizematrix(image)
+
+        Log.i("PaddingOffset", "width: ${image.width()} and height: ${image.height()}")
+
+        if(image.width() < image.height()) {
+            this.paddingOffset = image.height() - image.width()
+            image = paddImage(image, true)
+            isPortrait = "true"
+        } else {
+            this.paddingOffset = image.width() - image.height()
+            image = paddImage(image, false)
+            isPortrait = "false"
+        }
+
+        val interpreterBitmap: Bitmap = Bitmap.createBitmap(RESIZE_SIZE, RESIZE_SIZE, Bitmap.Config.ARGB_4444)
+        Utils.matToBitmap(image, interpreterBitmap)
+
+        imageByteBuffer = ByteBuffer.allocateDirect(IMAGE_HEIGHT * IMAGE_WIDTH * 3)
+        imageByteBuffer.order(ByteOrder.nativeOrder())
+
+        try {
+            tensorflowInterpreter = Interpreter(File(filesDir, "tflite_model.tflite"))
+            Log.i("Tensorflow", "Tensorflow model loaded successfully")
+        } catch (e: java.lang.Exception) {
+            Log.i("Tensorflow", "Error loading Tflite model")
+        }
+
+        convertBitmapToFloatArray(interpreterBitmap)
+        tensorflowInterpreter.run(floatArray, resultData)
+
+        resultData.rewind()
+
+        val segmentationmask = Mat(RESIZE_SIZE, RESIZE_SIZE, CvType.CV_8UC3)
+        for(i in 0..(RESIZE_SIZE -1)) {
+            for(j in 0..(RESIZE_SIZE -1)) {
+                val value = resultData.getFloat()
+                if(value != 0.toFloat()) {
+                    segmentationmask.put(i, j, 1.0, 1.0, 1.0)
+                } else {
+                    segmentationmask.put(i, j, 0.0, 0.0, 0.0)
+                }
+            }
+        }
+
+        val finalCroppedImage = segmentationmask.mul(image)
+
+        // Apply blur to the original image
+        Imgproc.GaussianBlur(image, image, Size(55.0, 55.0), 2.0)
+
+        var finalBokehImageWithoutCrop = Mat(RESIZE_SIZE, RESIZE_SIZE, CvType.CV_8UC3)
+        for (i in 0..(finalCroppedImage.height() -1)) {
+            for (j in 0..(finalCroppedImage.width() -1)) {
+                if((finalCroppedImage.get(i, j)[0] == 0.0) && (finalCroppedImage.get(i, j)[1] == 0.0) && (finalCroppedImage.get(i, j)[2] == 0.0)) {
+                    finalBokehImageWithoutCrop.put(i, j, image.get(i, j)[0], image.get(i, j)[1], image.get(i, j)[2])
+                } else {
+                    finalBokehImageWithoutCrop.put(i, j, finalCroppedImage.get(i, j)[0], finalCroppedImage.get(i, j)[1], finalCroppedImage.get(i, j)[2])
+                }
+            }
+        }
+
+        // Unpadd the Image
+        Log.i("PaddingOffset", this.paddingOffset.toString())
+        val finalImage = removePaddingOfImage(finalBokehImageWithoutCrop, this.paddingOffset, isPortrait)
+
+        Imgcodecs.imwrite(saveDirectory + Date().time.toString() + ".png", finalImage)
+        resultData.rewind()
     }
 }

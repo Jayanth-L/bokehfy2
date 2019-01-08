@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:bokehfyapp/widgets/image_viewer.dart';
+import 'package:bokehfyapp/widgets/camera_imageviewer.dart';
 import 'package:flutter/services.dart';
 import 'package:bokehfyapp/widgets/progress_indicator.dart';
+import 'package:bokehfyapp/widgets/all_portraitimagesviewer.dart';
 
 class PortraitPageClass {
   static final platform = MethodChannel("BokehfyImage");
@@ -120,7 +122,8 @@ class PortraitPageClass {
                         icon: Icon(Icons.add),
                         color: Colors.white,
                         onPressed: () {
-                          showDialog(
+                          
+                           showDialog(
                               builder: (BuildContext context) {
                                  _getCameraImageToPortraitAndPortrify().then((_) {
                                    Navigator.of(context).pop();
@@ -134,6 +137,8 @@ class PortraitPageClass {
                               context: context,
                               barrierDismissible: false,
                             );
+                          /*
+                          */
                          
                         },
                       ),
@@ -180,14 +185,14 @@ class PortraitPageClass {
           child: imageWidget("assets/img2.jpg", "Camera pics"),
           onTap: () {
             Navigator.of(context).push(MaterialPageRoute(
-                builder: (BuildContext context) => ImageViewPage()));
+                builder: (BuildContext context) => CameraImageViewPage()));
           },
         ),
         GestureDetector(
           child: imageWidget("assets/img3.jpg", "Everything you have!"),
           onTap: () {
             Navigator.of(context).push(MaterialPageRoute(
-                builder: (BuildContext context) => ImageViewPage()));
+                builder: (BuildContext context) => AllPortraitImagesViewpage()));
           },
         )
       ],
@@ -270,7 +275,7 @@ class PortraitPageClass {
 
   Future<String> _getCameraImageToPortraitAndPortrify() async {
     var response = await platform.invokeMethod(
-        "getCameraImagepathToPortraitAndPortrify", {"images": "images"});
+        "getCameraImagepathToPortraitAndPortrify", {"imagepath": "images"});
     return response;
   }
 
