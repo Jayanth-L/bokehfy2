@@ -1,7 +1,3 @@
-import 'dart:io';
-
-import 'widgets/image_viewer.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -45,7 +41,7 @@ class _BokehfyAppPageState extends State<BokehfyAppPage> {
     pages = [
       PortraitPageClass(context: context).PortraitPage(), 
       ChromePortraitPageClass(context: context).ChromportraitPage(),
-      ProModePageClass(context: context).ProModePage(),
+      //ProModePageClass(context: context).ProModePage(),
       AboutPageClass(context: context).AboutPage()
     ];
     return Scaffold(
@@ -60,11 +56,16 @@ class _BokehfyAppPageState extends State<BokehfyAppPage> {
         leading: IconButton(
           icon: Icon(Icons.menu),
           color: Colors.black,
-          onPressed: () {},
+          onPressed: () {
+            showModalBottomSheet(
+              context: context,
+              builder: (BuildContext context) => _openDrawer()
+            );
+          },
         ),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.search),
+            icon: Icon(Icons.sentiment_very_satisfied),
             color: Colors.black,
             onPressed: () {},
           )
@@ -81,12 +82,12 @@ class _BokehfyAppPageState extends State<BokehfyAppPage> {
               } else if (index == 1) {
                 _top_app_bar_color = Colors.deepPurple;
                 _current_page_index = 1;
-              } else if (index == 2) {
+              } /*else if (index == 2) {
                 _top_app_bar_color = Colors.grey;
                 _current_page_index = 2;
-              } else if (index == 3) {
+              }*/ else if (index == 2) {
                 _top_app_bar_color = Colors.pink;
-                _current_page_index = 3;
+                _current_page_index = 2;
               }
             });
           },
@@ -99,16 +100,52 @@ class _BokehfyAppPageState extends State<BokehfyAppPage> {
                 icon: Icon(Icons.colorize, color: Colors.green,),
                 title: Text("Highlight", style: TextStyle(color: Colors.green)),
                 backgroundColor: Colors.white),
-            BottomNavigationBarItem(
+            /*BottomNavigationBarItem(
                 icon: Icon(Icons.portrait, color: Colors.orange,),
                 title: Text("Pro mode", style: TextStyle(color: Colors.orange)),
-                backgroundColor: Colors.white),
+                backgroundColor: Colors.white), */
             BottomNavigationBarItem(
                 icon: Icon(Icons.info, color: Colors.deepPurple,),
                 title: Text("About", style: TextStyle(color: Colors.deepPurple)),
                 backgroundColor: Colors.white)
           ]),
       body: pages[_current_bottom_nav_bar_index]
+    );
+  }
+
+  Widget _openDrawer() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        ListTile(
+          leading: Icon(Icons.home, color: Colors.green,),
+          title: Text("About"),
+          onTap: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.security, color: Colors.orange,),
+          title: Text("Privacy Policy"),
+          onTap: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.share, color: Colors.blue,),
+          title: Text("Share App"),
+          onTap: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.thumb_up, color: Colors.deepPurple),
+          title: Text("Rate us :)"),
+          onTap: () {
+            Navigator.of(context).pop();
+          },
+        )
+      ],
     );
   }
 

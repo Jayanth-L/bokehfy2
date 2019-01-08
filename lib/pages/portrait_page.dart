@@ -266,7 +266,7 @@ class PortraitPageClass {
   // Platform channels methods.
 
   // Function to get the imagepath
-  //TODO:// need to implement below in the native code
+
   Future<String> _getImageToPortrait() async {
     var response = await platform
         .invokeMethod("getImagepathToPortrait", {"images": "images"});

@@ -51,9 +51,13 @@ class MainActivity: FlutterActivity() {
     val PICK_IMAGE_FOR_PORTRAIT_REQUESTCODE = 101
     val PICK_CAMERA_IMAGE_FOR_PORTRAIT_REQUESTCODE = 102
 
+    val PICK_IMAGE_FOR_CHROMIFYCATION_REQUESTCODE = 103
+    val PICK_CAMERA_IMAGE_FOR_CHROMYFICATION_REQUESTCODE = 104
+
     val CHANNEL_BOKEHFY = "BokehfyImage"
 
     lateinit var tensorflowInterpreter: Interpreter
+    var isTensorflowInitialized = false
 
     val RESIZE_SIZE = 720
     val IMAGE_HEIGHT = 720
@@ -139,6 +143,13 @@ class MainActivity: FlutterActivity() {
                 }
                 bokehImagesList.removeAt(0)
                 result.success(bokehImagesList)
+            } else if(methodCall.method.equals("getChromifyImages")) {
+                val chromifyImagesList:  ArrayList<String> = arrayListOf()
+                File(Environment.getExternalStorageDirectory().toString() + "/Bokehfy/ColorHighlight/Images/").walk().forEach {
+                    chromifyImagesList.add(it.toString())
+                }
+                chromifyImagesList.removeAt(0)
+                result.success(chromifyImagesList)
             }
             else if(methodCall.method.equals("getBokehImagesCamera")) {
                 val bokehImagesList:  ArrayList<String> = arrayListOf()
@@ -147,6 +158,13 @@ class MainActivity: FlutterActivity() {
                 }
                 bokehImagesList.removeAt(0)
                 result.success(bokehImagesList)
+            } else if(methodCall.method.equals("getChromifyImagesCamera")) {
+                val chromifyImagesList:  ArrayList<String> = arrayListOf()
+                File(Environment.getExternalStorageDirectory().toString() + "/Bokehfy/ColorHighlight/Camera/").walk().forEach {
+                    chromifyImagesList.add(it.toString())
+                }
+                chromifyImagesList.removeAt(0)
+                result.success(chromifyImagesList)
             }
             else if(methodCall.method.equals("getAllPortraitImages")) {
                 val bokehImagesList:  ArrayList<String> = arrayListOf()
@@ -163,6 +181,21 @@ class MainActivity: FlutterActivity() {
 
 
                 result.success(bokehImageList2 + bokehImagesList)
+            } else if (methodCall.method.equals("getAllChromifyImages")) {
+                val chromifyImagesList:  ArrayList<String> = arrayListOf()
+                val chromifyImageList2: ArrayList<String> = arrayListOf()
+                File(Environment.getExternalStorageDirectory().toString() + "/Bokehfy/ColorHighlight/Images/").walk().forEach {
+                    chromifyImagesList.add(it.toString())
+                }
+                var count = 0
+                File(Environment.getExternalStorageDirectory().toString() + "/Bokehfy/ColorHighlight/Camera/").walk().forEach {
+                    chromifyImageList2.add(it.toString())
+                }
+                chromifyImageList2.removeAt(0)
+                chromifyImagesList.removeAt(0)
+
+
+                result.success(chromifyImageList2 + chromifyImagesList)
             }
 
             else if(methodCall.method.equals("getImagepathToPortrait")) {
@@ -212,6 +245,48 @@ class MainActivity: FlutterActivity() {
                 }, this, result).execute()
             }
 
+
+            // From here the Color Chromifycation Stuff starts
+
+            else if(methodCall.method.equals("getImagepathToChromePortrait")) {
+                this.pendingIntentnResult = result
+                val pickImageIntent = Intent(Intent.ACTION_GET_CONTENT)
+                pickImageIntent.type = "image/*"
+                startActivityForResult(pickImageIntent, PICK_IMAGE_FOR_CHROMIFYCATION_REQUESTCODE)
+            } else if(methodCall.method.equals("sendImageForchromifycation")) {
+                AsyncHandler({
+
+                    val imagepath = arguments.get("imagepath").toString()
+
+                    aiConvertToMonoChrome(imagepath, imageColorHighlightDirectory)
+                    return@AsyncHandler true
+                }, this, result).execute()
+            } else if(methodCall.method.equals("getCameraImagepathToPortraitAndChromify")) {
+                this.pendingIntentnResult = result
+                Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
+                    // Ensure that there's a camera activity to handle the intent
+                    takePictureIntent.resolveActivity(packageManager)?.also {
+                        // Create the File where the photo should go
+                        val photoFile: File? = try {
+                            createImageFile()
+                        } catch (ex: IOException) {
+                            // Error occurred while creating the File
+                            null
+                        }
+                        // Continue only if the File was successfully created
+                        photoFile?.also {
+                            val photoURI: Uri = FileProvider.getUriForFile(
+                                    this,
+                                    this.applicationContext.packageName + ".com.aiportraitapp.jayanthl.bokehfyapp.provider",
+                                    it
+                            )
+                            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+                            startActivityForResult(takePictureIntent, PICK_CAMERA_IMAGE_FOR_CHROMYFICATION_REQUESTCODE)
+                        }
+                    }
+                }
+            }
+
             
         }
 
@@ -253,7 +328,32 @@ class MainActivity: FlutterActivity() {
                 e.printStackTrace()
             }
 
-        } else {
+        } else if(requestCode == PICK_IMAGE_FOR_CHROMIFYCATION_REQUESTCODE) {
+            try {
+                val path = FileUtils().getPathFromUri(this, data!!.data)
+                pendingIntentnResult.success(path)
+            } catch (e: java.lang.Exception) {
+                pendingIntentnResult.success("")
+            }
+        } else if (requestCode == PICK_CAMERA_IMAGE_FOR_CHROMYFICATION_REQUESTCODE && resultCode == Activity.RESULT_OK) {
+            try {
+                AsyncHandler({
+
+
+                    aiConvertToMonoChrome(mCurrentPhotoPath,  cameraColorHighlightDirectory)
+                    if(File(mCurrentPhotoPath).exists()) {
+                        File(mCurrentPhotoPath).delete()
+                    }
+
+                    return@AsyncHandler true
+                }, this, pendingIntentnResult).execute()
+            } catch (e: java.lang.Exception) {
+                pendingIntentnResult.success("success")
+                e.printStackTrace()
+            }
+        }
+
+        else {
             pendingIntentnResult.success("")
         }
     }
@@ -399,15 +499,22 @@ class MainActivity: FlutterActivity() {
         imageByteBuffer = ByteBuffer.allocateDirect(IMAGE_HEIGHT * IMAGE_WIDTH * 3)
         imageByteBuffer.order(ByteOrder.nativeOrder())
 
-        try {
-            tensorflowInterpreter = Interpreter(File(filesDir, "tflite_model.tflite"))
-            Log.i("Tensorflow", "Tensorflow model loaded successfully")
-        } catch (e: java.lang.Exception) {
-            Log.i("Tensorflow", "Error loading Tflite model")
-        }
-
         convertBitmapToFloatArray(interpreterBitmap)
-        tensorflowInterpreter.run(floatArray, resultData)
+
+        try {
+            if(isTensorflowInitialized) {
+                Log.i("Tensorflow", "Tensorflow model was loaded already")
+                tensorflowInterpreter.run(floatArray, resultData)
+            } else {
+                tensorflowInterpreter = Interpreter(File(filesDir, "tflite_model.tflite"))
+                tensorflowInterpreter.run(floatArray, resultData)
+                Log.i("Tensorflow", "Tensorflow model loaded successfully")
+                isTensorflowInitialized = true
+            }
+        } catch (e: Exception) {
+            Log.i("Tensorflow", "There was a problem in loading tensorflow")
+            isTensorflowInitialized = false
+        }
 
         resultData.rewind()
 
@@ -427,6 +534,84 @@ class MainActivity: FlutterActivity() {
 
         // Apply blur to the original image
         Imgproc.GaussianBlur(image, image, Size(55.0, 55.0), 2.0)
+
+        var finalBokehImageWithoutCrop = Mat(RESIZE_SIZE, RESIZE_SIZE, CvType.CV_8UC3)
+        for (i in 0..(finalCroppedImage.height() -1)) {
+            for (j in 0..(finalCroppedImage.width() -1)) {
+                if((finalCroppedImage.get(i, j)[0] == 0.0) && (finalCroppedImage.get(i, j)[1] == 0.0) && (finalCroppedImage.get(i, j)[2] == 0.0)) {
+                    finalBokehImageWithoutCrop.put(i, j, image.get(i, j)[0], image.get(i, j)[1], image.get(i, j)[2])
+                } else {
+                    finalBokehImageWithoutCrop.put(i, j, finalCroppedImage.get(i, j)[0], finalCroppedImage.get(i, j)[1], finalCroppedImage.get(i, j)[2])
+                }
+            }
+        }
+
+        // Unpadd the Image
+        Log.i("PaddingOffset", this.paddingOffset.toString())
+        val finalImage = removePaddingOfImage(finalBokehImageWithoutCrop, this.paddingOffset, isPortrait)
+
+        Imgcodecs.imwrite(saveDirectory + Date().time.toString() + ".png", finalImage)
+        resultData.rewind()
+    }
+
+    fun aiConvertToMonoChrome(imagePath: String, saveDirectory: String) {
+        var image = Imgcodecs.imread(imagePath)
+        image = resizematrix(image)
+
+        Log.i("PaddingOffset", "width: ${image.width()} and height: ${image.height()}")
+
+        if(image.width() < image.height()) {
+            this.paddingOffset = image.height() - image.width()
+            image = paddImage(image, true)
+            isPortrait = "true"
+        } else {
+            this.paddingOffset = image.width() - image.height()
+            image = paddImage(image, false)
+            isPortrait = "false"
+        }
+
+        val interpreterBitmap: Bitmap = Bitmap.createBitmap(RESIZE_SIZE, RESIZE_SIZE, Bitmap.Config.ARGB_4444)
+        Utils.matToBitmap(image, interpreterBitmap)
+
+        imageByteBuffer = ByteBuffer.allocateDirect(IMAGE_HEIGHT * IMAGE_WIDTH * 3)
+        imageByteBuffer.order(ByteOrder.nativeOrder())
+        convertBitmapToFloatArray(interpreterBitmap)
+
+        try {
+            if(isTensorflowInitialized) {
+                Log.i("Tensorflow", "Tensorflow model was loaded already")
+                tensorflowInterpreter.run(floatArray, resultData)
+
+            } else {
+                tensorflowInterpreter = Interpreter(File(filesDir, "tflite_model.tflite"))
+                tensorflowInterpreter.run(floatArray, resultData)
+                Log.i("Tensorflow", "Tensorflow model loaded successfully")
+                isTensorflowInitialized = true
+            }
+        } catch (e: Exception) {
+            Log.i("Tensorflow", "There was a problem in loading tensorflow")
+            isTensorflowInitialized = false
+        }
+
+        resultData.rewind()
+
+        val segmentationmask = Mat(RESIZE_SIZE, RESIZE_SIZE, CvType.CV_8UC3)
+        for(i in 0..(RESIZE_SIZE -1)) {
+            for(j in 0..(RESIZE_SIZE -1)) {
+                val value = resultData.getFloat()
+                if(value != 0.toFloat()) {
+                    segmentationmask.put(i, j, 1.0, 1.0, 1.0)
+                } else {
+                    segmentationmask.put(i, j, 0.0, 0.0, 0.0)
+                }
+            }
+        }
+
+        val finalCroppedImage = segmentationmask.mul(image)
+
+        // Apply blur to the original image
+        Imgproc.cvtColor(image, image, Imgproc.COLOR_BGR2GRAY)
+        Imgproc.cvtColor(image, image, Imgproc.COLOR_GRAY2BGR)
 
         var finalBokehImageWithoutCrop = Mat(RESIZE_SIZE, RESIZE_SIZE, CvType.CV_8UC3)
         for (i in 0..(finalCroppedImage.height() -1)) {
