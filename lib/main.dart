@@ -5,6 +5,8 @@ import 'pages/portrait_page.dart';
 import 'pages/chromeportrait_page.dart';
 import 'pages/about_page.dart';
 import 'pages/promode_page.dart';
+import 'helpers/privacy_policy.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() => runApp(BokehfyApp());
 
@@ -122,6 +124,24 @@ class _BokehfyAppPageState extends State<BokehfyAppPage> {
           title: Text("About"),
           onTap: () {
             Navigator.of(context).pop();
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text("Magically convert your pics to Portrait pics!"),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: Text("Wow!"),
+                      onPressed: () => Navigator.of(context).pop()
+                    ),
+                    FlatButton(
+                      child: Text("Good"),
+                      onPressed: () => Navigator.of(context).pop()
+                    )
+                  ],
+                );
+              }
+            );
           },
         ),
         ListTile(
@@ -129,6 +149,11 @@ class _BokehfyAppPageState extends State<BokehfyAppPage> {
           title: Text("Privacy Policy"),
           onTap: () {
             Navigator.of(context).pop();
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (BuildContext context) => PrivacyPolicyPage()
+              )
+            );
           },
         ),
         ListTile(
@@ -136,6 +161,8 @@ class _BokehfyAppPageState extends State<BokehfyAppPage> {
           title: Text("Share App"),
           onTap: () {
             Navigator.of(context).pop();
+
+            // TODO:// Implement share app.
           },
         ),
         ListTile(
@@ -143,10 +170,22 @@ class _BokehfyAppPageState extends State<BokehfyAppPage> {
           title: Text("Rate us :)"),
           onTap: () {
             Navigator.of(context).pop();
+            _launchUrl("market://details?id=com.bitcryptorapp.jayanthl.bitcryptorapp");
           },
         )
       ],
     );
+  }
+
+  void _launchUrl(url) async {
+    try {
+      if(await canLaunch(url)) {
+        await launch(url);
+      }
+    } catch(exception, stacktrace) {
+      print(exception);
+      print(stacktrace);
+    }
   }
 
   
