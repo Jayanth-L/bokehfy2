@@ -52,6 +52,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
   Future<List> _getBokehImages() async {
     bokehImagesList =
         await platform.invokeMethod("getBokehImages", {"images": "images"});
+    bokehImagesList.sort();
     return bokehImagesList;
   }
 }

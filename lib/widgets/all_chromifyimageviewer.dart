@@ -51,6 +51,7 @@ class _AllChromifyImagesViewpageState extends State<AllChromifyImagesViewpage> {
 
   Future<List> _getAllImagesToChromify() async {
     bokehImagesList = await platform.invokeMethod("getAllChromifyImages", {"images": "images"});
+    bokehImagesList.sort();
     return bokehImagesList;
   }
 }

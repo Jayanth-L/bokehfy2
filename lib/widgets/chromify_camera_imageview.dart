@@ -52,6 +52,7 @@ class _CameraChromifyImageViewPageState extends State<CameraChromifyImageViewPag
   Future<List> _getChromifyImages() async {
     bokehImagesList =
         await platform.invokeMethod("getChromifyImagesCamera", {"images": "images"});
+    bokehImagesList.sort();
     return bokehImagesList;
   }
 }

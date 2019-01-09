@@ -52,6 +52,7 @@ class _CameraImageViewPageState extends State<CameraImageViewPage> {
   Future<List> _getBokehImages() async {
     bokehImagesList =
         await platform.invokeMethod("getBokehImagesCamera", {"images": "images"});
+    bokehImagesList.sort();
     return bokehImagesList;
   }
 }

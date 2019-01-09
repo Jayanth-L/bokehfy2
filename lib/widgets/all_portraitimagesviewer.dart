@@ -51,6 +51,7 @@ class _AllPortraitImagesViewpageState extends State<AllPortraitImagesViewpage> {
 
   Future<List> _getAllImagesToPortrait() async {
     bokehImagesList = await platform.invokeMethod("getAllPortraitImages", {"images": "images"});
+    bokehImagesList.sort();
     return bokehImagesList;
   }
 }
