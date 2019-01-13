@@ -4,9 +4,9 @@ import 'package:flutter/services.dart';
 import 'pages/portrait_page.dart';
 import 'pages/chromeportrait_page.dart';
 import 'pages/about_page.dart';
-import 'pages/promode_page.dart';
 import 'helpers/privacy_policy.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:share/share.dart';
 
 void main() => runApp(BokehfyApp());
 
@@ -162,6 +162,7 @@ class _BokehfyAppPageState extends State<BokehfyAppPage> {
           onTap: () {
             Navigator.of(context).pop();
 
+            Share.share("Checkout the AI Powered Bokeh converter app");
             // TODO:// Implement share app.
           },
         ),
