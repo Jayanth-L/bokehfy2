@@ -39,6 +39,8 @@ class _ImageViewPageState extends State<ImageViewPage> {
           }
           return PhotoViewGallery(
             pageOptions: opt,
+            loadingChild: Text("Loading Image..."),
+            enableRotation: true,
           );
         } else {
           return Container(

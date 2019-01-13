@@ -20,153 +20,127 @@ class ChromePortraitPageClass {
     return ListView(
       padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
       children: <Widget>[
-        Container(
-          height: 125.0,
-          width: double.infinity,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.all(10.0),
-            children: <Widget>[
-              Column(
-                children: <Widget>[
-                  Card(
-                    shape: CircleBorder(),
-                    color: Colors.white,
-                    elevation: 5.0,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            Container(
+              height: 90.0,
+              width: (MediaQuery.of(context).size.width - 30) / 2,
+              child: Padding(
+                padding: EdgeInsets.all(10.0),
+                child: GestureDetector(
+                  child: Card(
+                    elevation: 10.0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0)),
                     child: Container(
-                      height: 70.0,
-                      width: 70.0,
                       decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(35.0),
-                          color: Colors.orange),
-                      child: IconButton(
-                        icon: Icon(Icons.add),
-                        color: Colors.white,
-                        onPressed: () {
-                          print("tapped");
-                          // TODO:// Here add new image action goes i.e; intent_action_get native code
-                          _getImageToChromify().then((_) {
-                            // Got the Image path
-                            print("image_path: " + _);
-                            // Now send it for the bokehfycation
-
-                            // show the dialog
-                            if (_ != "") {
-                              showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: Text("Convert to MonoChrome Color pic ?"),
-                                      content: Text(
-                                          "Sure you want to convert to MonoChrome Color image ?"),
-                                      actions: <Widget>[
-                                        FlatButton(
-                                          child: Text("No"),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                        ),
-                                        FlatButton(
-                                          child: Text("Yes"),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                            showDialog(
-                                              builder: (BuildContext context) {
-                                                _sendImageForChromifycation(_)
-                                                    .then((_response) {
-                                                  print(_response);
-                                                  Navigator.of(context).pop();
-                                                });
-                                                return Center(
-                                                    child: Material(
-                                                        color:
-                                                            Colors.transparent,
-                                                        child: DotProgress()));
-                                                //return Center(child: Material(child: Row(children: <Widget>[ CircularProgressIndicator(),Text("Bokehfying", style: TextStyle(color: Colors.black),),], mainAxisSize: MainAxisSize.min,)));
-                                              },
-                                              context: context,
-                                              barrierDismissible: false,
-                                            );
-                                          },
-                                        )
-                                      ],
-                                    );
-                                  });
-                            }
-                          });
-                        },
+                          color: Colors.green,
+                          borderRadius: BorderRadius.circular(10.0)),
+                      child: Center(
+                        child: Icon(Icons.add_a_photo,
+                            color: Colors.white, size: 30.0),
                       ),
                     ),
                   ),
-                  SizedBox(height: 7.0),
-                  Text("Add to",
-                      style: TextStyle(
-                          fontSize: 14.0,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black))
-                ],
-              ),
-              Column(
-                children: <Widget>[
-                  Card(
-                    shape: CircleBorder(),
-                    color: Colors.white,
-                    elevation: 5.0,
-                    child: Container(
-                      height: 70.0,
-                      width: 70.0,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(35.0),
-                          color: Colors.green),
-                      child: IconButton(
-                        icon: Icon(Icons.add),
-                        color: Colors.white,
-                        onPressed: () {
+                  onTap: () {
+                    print("tapped");
+                    // TODO:// Here add new image action goes i.e; intent_action_get native code
+                    _getImageToChromify().then((_) {
+                      // Got the Image path
+                      print("image_path: " + _);
+                      // Now send it for the bokehfycation
 
-                          showDialog(
-                              builder: (BuildContext context) {
-                                 _getCameraImageToChromyAndChromify().then((_) {
-                                   Navigator.of(context).pop();
-                                  });
-                                return Center(
-                                    child: Material(
-                                        color: Colors.transparent,
-                                        child: DotProgress()));
-                                //return Center(child: Material(child: Row(children: <Widget>[ CircularProgressIndicator(),Text("Bokehfying", style: TextStyle(color: Colors.black),),], mainAxisSize: MainAxisSize.min,)));
-                              },
-                              context: context,
-                              barrierDismissible: false,
-                            );
-                        },
-                      ),
+                      // show the dialog
+                      if (_ != "") {
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title:
+                                    Text("Convert to MonoChrome Color pic ?"),
+                                content: Text(
+                                    "Sure you want to convert to MonoChrome Color image ?"),
+                                actions: <Widget>[
+                                  FlatButton(
+                                    child: Text("No"),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                  FlatButton(
+                                    child: Text("Yes"),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                      showDialog(
+                                        builder: (BuildContext context) {
+                                          _sendImageForChromifycation(_)
+                                              .then((_response) {
+                                            print(_response);
+                                            Navigator.of(context).pop();
+                                          });
+                                          return Center(
+                                              child: Material(
+                                                  color: Colors.transparent,
+                                                  child: DotProgress()));
+                                          //return Center(child: Material(child: Row(children: <Widget>[ CircularProgressIndicator(),Text("Bokehfying", style: TextStyle(color: Colors.black),),], mainAxisSize: MainAxisSize.min,)));
+                                        },
+                                        context: context,
+                                        barrierDismissible: false,
+                                      );
+                                    },
+                                  )
+                                ],
+                              );
+                            });
+                      }
+                    });
+                  },
+                ),
+              ),
+            ),
+            Container(
+              height: 90.0,
+              width: (MediaQuery.of(context).size.width - 30) / 2,
+              child: Padding(
+                padding: EdgeInsets.all(10.0),
+                child: GestureDetector(
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0)),
+                    elevation: 10.0,
+                    child: Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10.0),
+                          color: Colors.blue),
+                      child: Center(
+                          child: Icon(
+                        Icons.camera,
+                        color: Colors.white,
+                        size: 30.0,
+                      )),
                     ),
                   ),
-                  SizedBox(height: 7.0),
-                  Text("Take pic",
-                      style: TextStyle(
-                          fontSize: 14.0,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black))
-                ],
+                  onTap: () {
+                    showDialog(
+                      builder: (BuildContext context) {
+                        _getCameraImageToChromyAndChromify().then((_) {
+                          Navigator.of(context).pop();
+                        });
+                        return Center(
+                            child: Material(
+                                color: Colors.transparent,
+                                child: DotProgress()));
+                        //return Center(child: Material(child: Row(children: <Widget>[ CircularProgressIndicator(),Text("Bokehfying", style: TextStyle(color: Colors.black),),], mainAxisSize: MainAxisSize.min,)));
+                      },
+                      context: context,
+                      barrierDismissible: false,
+                    );
+                  },
+                ),
               ),
-              SizedBox(
-                width: 15.0,
-              ),
-              listItem("assets/img1.jpg"),
-              SizedBox(
-                width: 15.0,
-              ),
-              listItem("assets/img2.jpg"),
-              SizedBox(
-                width: 15.0,
-              ),
-              listItem("assets/img3.jpg"),
-              SizedBox(
-                width: 15.0,
-              ),
-              listItem("assets/img4.jpg"),
-            ],
-          ),
+            )
+          ],
         ),
         SizedBox(
           height: 15.0,
@@ -182,14 +156,16 @@ class ChromePortraitPageClass {
           child: imageWidget("assets/img4.jpg", "Camera pics"),
           onTap: () {
             Navigator.of(context).push(MaterialPageRoute(
-                builder: (BuildContext context) => CameraChromifyImageViewPage()));
+                builder: (BuildContext context) =>
+                    CameraChromifyImageViewPage()));
           },
         ),
         GestureDetector(
           child: imageWidget("assets/img2.jpg", "Everything you have!"),
           onTap: () {
             Navigator.of(context).push(MaterialPageRoute(
-                builder: (BuildContext context) => AllChromifyImagesViewpage()));
+                builder: (BuildContext context) =>
+                    AllChromifyImagesViewpage()));
           },
         )
       ],
@@ -221,7 +197,7 @@ class ChromePortraitPageClass {
       child: Card(
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-        elevation: 5.0,
+        elevation: 10.0,
         color: Colors.white,
         child: Container(
           height: 250.0,
@@ -287,3 +263,72 @@ class ChromePortraitPageClass {
     return response;
   }
 }
+
+/*
+print("tapped");
+                          // TODO:// Here add new image action goes i.e; intent_action_get native code
+                          _getImageToChromify().then((_) {
+                            // Got the Image path
+                            print("image_path: " + _);
+                            // Now send it for the bokehfycation
+
+                            // show the dialog
+                            if (_ != "") {
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text("Convert to MonoChrome Color pic ?"),
+                                      content: Text(
+                                          "Sure you want to convert to MonoChrome Color image ?"),
+                                      actions: <Widget>[
+                                        FlatButton(
+                                          child: Text("No"),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                        FlatButton(
+                                          child: Text("Yes"),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                            showDialog(
+                                              builder: (BuildContext context) {
+                                                _sendImageForChromifycation(_)
+                                                    .then((_response) {
+                                                  print(_response);
+                                                  Navigator.of(context).pop();
+                                                });
+                                                return Center(
+                                                    child: Material(
+                                                        color:
+                                                            Colors.transparent,
+                                                        child: DotProgress()));
+                                                //return Center(child: Material(child: Row(children: <Widget>[ CircularProgressIndicator(),Text("Bokehfying", style: TextStyle(color: Colors.black),),], mainAxisSize: MainAxisSize.min,)));
+                                              },
+                                              context: context,
+                                              barrierDismissible: false,
+                                            );
+                                          },
+                                        )
+                                      ],
+                                    );
+                                  });
+                            }
+                          }); */
+
+/*
+ showDialog(
+                              builder: (BuildContext context) {
+                                 _getCameraImageToChromyAndChromify().then((_) {
+                                   Navigator.of(context).pop();
+                                  });
+                                return Center(
+                                    child: Material(
+                                        color: Colors.transparent,
+                                        child: DotProgress()));
+                                //return Center(child: Material(child: Row(children: <Widget>[ CircularProgressIndicator(),Text("Bokehfying", style: TextStyle(color: Colors.black),),], mainAxisSize: MainAxisSize.min,)));
+                              },
+                              context: context,
+                              barrierDismissible: false,
+                            ); */

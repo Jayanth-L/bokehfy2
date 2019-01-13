@@ -39,6 +39,8 @@ class _ChromifyImageViewPageState extends State<ChromifyImageViewPage> {
           }
           return PhotoViewGallery(
             pageOptions: opt,
+            loadingChild: Text("Loading Image..."),
+            enableRotation: true,
           );
         } else {
           return Container(

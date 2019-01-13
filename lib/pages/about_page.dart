@@ -26,7 +26,7 @@ class AboutPageClass {
                   mainAxisSize: MainAxisSize.max,
                   children: <Widget>[
                     Text("Hello Guys\n\nWelcome to the Bokehfy app, where the AI beautifys your pics by converting it to portrait and mono chrome color. \n\nThe app is in continuous development, stay tuned for more updates \n\nIf you love this app please consider buying me a coffee :)",
-                 style: TextStyle(fontSize: 17.0, color: Colors.black)),
+                 style: TextStyle(fontSize: 10.0, color: Colors.black)),
 
                  Padding(
                    padding: const EdgeInsets.only(top: 50.0),
