@@ -30,8 +30,11 @@ class _AllChromifyImagesViewpageState extends State<AllChromifyImagesViewpage> {
       future: _getAllImagesToChromify(),
       builder: (BuildContext context, AsyncSnapshot asyncshapshot) {
         var opt = <PhotoViewGalleryPageOptions>[];
+        //print(bokehImagesList);
+        bokehImagesList.sort();
+        var reversedBokehImagesList = bokehImagesList.reversed;
         if (bokehImagesList.length > 0) {
-          for (var images in bokehImagesList) {
+          for (var images in reversedBokehImagesList) {
             opt.add(PhotoViewGalleryPageOptions(
                 imageProvider: FileImage(File(images))));
           }
@@ -40,6 +43,7 @@ class _AllChromifyImagesViewpageState extends State<AllChromifyImagesViewpage> {
           );
         } else {
           return Container(
+            color: Colors.white,
             child: Center(
               child: Text("You don't have any portrait image, Add one :)")
             ),
@@ -52,6 +56,8 @@ class _AllChromifyImagesViewpageState extends State<AllChromifyImagesViewpage> {
   Future<List> _getAllImagesToChromify() async {
     bokehImagesList = await platform.invokeMethod("getAllChromifyImages", {"images": "images"});
     bokehImagesList.sort();
-    return bokehImagesList;
+    var reversedBokehImagesList = bokehImagesList.reversed;
+    print(reversedBokehImagesList);
+    return reversedBokehImagesList.toList();
   }
 }

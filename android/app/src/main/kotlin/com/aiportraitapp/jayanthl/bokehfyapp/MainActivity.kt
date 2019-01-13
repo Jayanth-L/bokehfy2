@@ -4,9 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.AssetFileDescriptor
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Color
+import android.graphics.*
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -548,7 +546,10 @@ class MainActivity: FlutterActivity() {
 
         // Unpadd the Image
         Log.i("PaddingOffset", this.paddingOffset.toString())
-        val finalImage = removePaddingOfImage(finalBokehImageWithoutCrop, this.paddingOffset, isPortrait)
+        var finalImage = removePaddingOfImage(finalBokehImageWithoutCrop, this.paddingOffset, isPortrait)
+
+        // Sample apply watermark
+        finalImage = HelperFunctions().applyWatermarkToImage(finalImage)
 
         Imgcodecs.imwrite(saveDirectory + Date().time.toString() + ".png", finalImage)
         resultData.rewind()
@@ -626,9 +627,15 @@ class MainActivity: FlutterActivity() {
 
         // Unpadd the Image
         Log.i("PaddingOffset", this.paddingOffset.toString())
-        val finalImage = removePaddingOfImage(finalBokehImageWithoutCrop, this.paddingOffset, isPortrait)
+        var finalImage = removePaddingOfImage(finalBokehImageWithoutCrop, this.paddingOffset, isPortrait)
+
+        // Sample watermark testing
+        finalImage = HelperFunctions().applyWatermarkToImage(finalImage)
 
         Imgcodecs.imwrite(saveDirectory + Date().time.toString() + ".png", finalImage)
         resultData.rewind()
     }
+
+    // Function to watermark an image
+
 }

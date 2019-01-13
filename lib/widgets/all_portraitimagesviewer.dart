@@ -30,8 +30,9 @@ class _AllPortraitImagesViewpageState extends State<AllPortraitImagesViewpage> {
       future: _getAllImagesToPortrait(),
       builder: (BuildContext context, AsyncSnapshot asyncshapshot) {
         var opt = <PhotoViewGalleryPageOptions>[];
+        var reversedBokehImagesList = bokehImagesList.reversed;
         if (bokehImagesList.length > 0) {
-          for (var images in bokehImagesList) {
+          for (var images in reversedBokehImagesList) {
             opt.add(PhotoViewGalleryPageOptions(
                 imageProvider: FileImage(File(images))));
           }
@@ -40,6 +41,7 @@ class _AllPortraitImagesViewpageState extends State<AllPortraitImagesViewpage> {
           );
         } else {
           return Container(
+            color: Colors.white,
             child: Center(
               child: Text("You don't have any portrait image, Add one :)")
             ),
@@ -52,6 +54,7 @@ class _AllPortraitImagesViewpageState extends State<AllPortraitImagesViewpage> {
   Future<List> _getAllImagesToPortrait() async {
     bokehImagesList = await platform.invokeMethod("getAllPortraitImages", {"images": "images"});
     bokehImagesList.sort();
-    return bokehImagesList;
+    Iterable reversedImageslist = bokehImagesList.reversed;
+    return reversedImageslist.toList();
   }
 }

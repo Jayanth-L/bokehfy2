@@ -30,8 +30,10 @@ class _ImageViewPageState extends State<ImageViewPage> {
       future: _getBokehImages(),
       builder: (BuildContext context, AsyncSnapshot asyncshapshot) {
         var opt = <PhotoViewGalleryPageOptions>[];
+        bokehImagesList.sort();
+        Iterable reversedImagesList = bokehImagesList.reversed;
         if (bokehImagesList.length > 0) {
-          for (var images in bokehImagesList) {
+          for (var images in reversedImagesList) {
             opt.add(PhotoViewGalleryPageOptions(
                 imageProvider: FileImage(File(images))));
           }
@@ -40,6 +42,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
           );
         } else {
           return Container(
+            color: Colors.white,
             child: Center(
               child: Text("You don't have any portrait image, Add one :)")
             ),
@@ -53,6 +56,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
     bokehImagesList =
         await platform.invokeMethod("getBokehImages", {"images": "images"});
     bokehImagesList.sort();
-    return bokehImagesList;
+    Iterable reversedImagesList = bokehImagesList.reversed;
+    return reversedImagesList.toList();
   }
 }
