@@ -38,6 +38,8 @@ class _AllPortraitImagesViewpageState extends State<AllPortraitImagesViewpage> {
           }
           return PhotoViewGallery(
             pageOptions: opt,
+            loadingChild: Text("Loading Image..."),
+            enableRotation: false,
           );
         } else {
           return Container(

@@ -39,6 +39,8 @@ class _CameraImageViewPageState extends State<CameraImageViewPage> {
           }
           return PhotoViewGallery(
             pageOptions: opt,
+            loadingChild: Text("Image Loading..."),
+            enableRotation: false,
           );
         } else {
           return Container(

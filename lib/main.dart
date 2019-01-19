@@ -27,16 +27,23 @@ class BokehfyAppPage extends StatefulWidget {
   _BokehfyAppPageState createState() => _BokehfyAppPageState();
 }
 
-class _BokehfyAppPageState extends State<BokehfyAppPage> {
+class _BokehfyAppPageState extends State<BokehfyAppPage> with SingleTickerProviderStateMixin {
 
-  List pages;
+  List<Widget> pages;
   int _current_page_index = 0;
+
+  TabController _tabController;
 
 
   static final platform = MethodChannel("BokehfyImage");
-  Color _top_app_bar_color = Colors.blue;
   int _current_bottom_nav_bar_index = 0;
   List bokehImagesList = [];
+
+  @override
+  void dispose() {
+    super.dispose();
+    _tabController.dispose();
+  }
   @override
   Widget build(BuildContext context) {
 
@@ -46,6 +53,9 @@ class _BokehfyAppPageState extends State<BokehfyAppPage> {
       //ProModePageClass(context: context).ProModePage(),
       AboutPageClass(context: context).AboutPage()
     ];
+
+     _tabController = TabController(vsync: this, length: pages.length);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -78,19 +88,8 @@ class _BokehfyAppPageState extends State<BokehfyAppPage> {
           onTap: (int index) {
             setState(() {
               _current_bottom_nav_bar_index = index;
-              if (index == 0) {
-                _top_app_bar_color = Colors.blue;
-                _current_page_index = 0;
-              } else if (index == 1) {
-                _top_app_bar_color = Colors.deepPurple;
-                _current_page_index = 1;
-              } /*else if (index == 2) {
-                _top_app_bar_color = Colors.grey;
-                _current_page_index = 2;
-              }*/ else if (index == 2) {
-                _top_app_bar_color = Colors.pink;
-                _current_page_index = 2;
-              }
+              _current_page_index = index;
+              _tabController.animateTo(index);
             });
           },
           items: [
@@ -111,7 +110,11 @@ class _BokehfyAppPageState extends State<BokehfyAppPage> {
                 title: Text("About", style: TextStyle(color: Colors.deepPurple)),
                 backgroundColor: Colors.white)
           ]),
-      body: pages[_current_bottom_nav_bar_index]
+      body: TabBarView(
+        controller: _tabController,
+        physics: NeverScrollableScrollPhysics(),
+        children: pages,
+      )
     );
   }
 

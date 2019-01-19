@@ -40,6 +40,8 @@ class _AllChromifyImagesViewpageState extends State<AllChromifyImagesViewpage> {
           }
           return PhotoViewGallery(
             pageOptions: opt,
+            loadingChild: Text("Loading Image..."),
+            enableRotation: false,
           );
         } else {
           return Container(

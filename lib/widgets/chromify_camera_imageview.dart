@@ -39,6 +39,8 @@ class _CameraChromifyImageViewPageState extends State<CameraChromifyImageViewPag
           }
           return PhotoViewGallery(
             pageOptions: opt,
+            loadingChild: Text("Loading Imaeg..."),
+            enableRotation: false,
           );
         } else {
           return Container(
