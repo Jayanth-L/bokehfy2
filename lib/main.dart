@@ -71,7 +71,7 @@ class _BokehfyAppPageState extends State<BokehfyAppPage> with SingleTickerProvid
           onPressed: () {
             showModalBottomSheet(
               context: context,
-              builder: (BuildContext context) => _openDrawer()
+              builder: (BuildContext context) => _openDrawer(),
             );
           },
         ),
@@ -112,7 +112,7 @@ class _BokehfyAppPageState extends State<BokehfyAppPage> with SingleTickerProvid
           ]),
       body: TabBarView(
         controller: _tabController,
-        physics: NeverScrollableScrollPhysics(),
+        // physics: NeverScrollableScrollPhysics(), // This diables sliding pages chane stuff.
         children: pages,
       )
     );

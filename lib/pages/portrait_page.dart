@@ -57,6 +57,7 @@ class PortraitPageClass {
                             context: context,
                             builder: (BuildContext context) {
                               return AlertDialog(
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
                                 title: Text("Convert to Portrait pic ?"),
                                 content: Text(
                                     "Sure you want to convert to portrait image ?"),
