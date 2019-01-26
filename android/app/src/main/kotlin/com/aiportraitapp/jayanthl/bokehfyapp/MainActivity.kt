@@ -531,7 +531,7 @@ class MainActivity: FlutterActivity() {
         val finalCroppedImage = segmentationmask.mul(image)
 
         // Apply blur to the original image
-        Imgproc.GaussianBlur(image, image, Size(55.0, 55.0), 2.0)
+        Imgproc.GaussianBlur(image, image, Size(55.0, 55.0), 3.0)  // Originally it was 2.0
 
         var finalBokehImageWithoutCrop = Mat(RESIZE_SIZE, RESIZE_SIZE, CvType.CV_8UC3)
         for (i in 0..(finalCroppedImage.height() -1)) {
