@@ -95,7 +95,7 @@ class _BokehfyAppPageState extends State<BokehfyAppPage> with AutomaticKeepAlive
               _current_page_index = index;
               // _tabController.animateTo(index);
               _fadeOutvisibility = false;
-              Future.delayed(Duration(milliseconds: 800), () {
+              Future.delayed(Duration(milliseconds: 700), () {
                 setState(() {
                 _currentSelectedPage = index;
                 _fadeOutvisibility = true;
@@ -211,7 +211,5 @@ class _BokehfyAppPageState extends State<BokehfyAppPage> with AutomaticKeepAlive
 
   @override
   // TODO: implement wantKeepAlive
-  bool get wantKeepAlive => null;
-
-  
+  bool get wantKeepAlive => true;
 }
