@@ -27,10 +27,13 @@ class BokehfyAppPage extends StatefulWidget {
   _BokehfyAppPageState createState() => _BokehfyAppPageState();
 }
 
-class _BokehfyAppPageState extends State<BokehfyAppPage> with SingleTickerProviderStateMixin {
+class _BokehfyAppPageState extends State<BokehfyAppPage> with AutomaticKeepAliveClientMixin {
 
   List<Widget> pages;
   int _current_page_index = 0;
+  var _currentSelectedPage = 0;
+
+  var _fadeOutvisibility = true;
 
   TabController _tabController;
 
@@ -54,7 +57,7 @@ class _BokehfyAppPageState extends State<BokehfyAppPage> with SingleTickerProvid
       AboutPageClass(context: context).AboutPage()
     ];
 
-     _tabController = TabController(vsync: this, length: pages.length);
+     //_tabController = TabController(vsync: this, length: pages.length);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -84,12 +87,20 @@ class _BokehfyAppPageState extends State<BokehfyAppPage> with SingleTickerProvid
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
           currentIndex: _current_bottom_nav_bar_index,
           onTap: (int index) {
             setState(() {
               _current_bottom_nav_bar_index = index;
               _current_page_index = index;
-              _tabController.animateTo(index);
+              // _tabController.animateTo(index);
+              _fadeOutvisibility = false;
+              Future.delayed(Duration(milliseconds: 800), () {
+                setState(() {
+                _currentSelectedPage = index;
+                _fadeOutvisibility = true;
+                });
+              });
             });
           },
           items: [
@@ -110,11 +121,17 @@ class _BokehfyAppPageState extends State<BokehfyAppPage> with SingleTickerProvid
                 title: Text("About", style: TextStyle(color: Colors.deepPurple)),
                 backgroundColor: Colors.white)
           ]),
-      body: TabBarView(
+      body: AnimatedOpacity(
+        child: pages[_currentSelectedPage],
+        duration: Duration(milliseconds: 700),
+        opacity: _fadeOutvisibility ? 1.0 : 0.0,
+      ),
+      
+       /*TabBarView(
         controller: _tabController,
         // physics: NeverScrollableScrollPhysics(), // This diables sliding pages chane stuff.
         children: pages,
-      )
+      ) */
     );
   }
 
@@ -191,6 +208,10 @@ class _BokehfyAppPageState extends State<BokehfyAppPage> with SingleTickerProvid
       print(stacktrace);
     }
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => null;
 
   
 }
