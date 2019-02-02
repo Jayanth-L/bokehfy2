@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:photo_view/photo_view_gallery.dart';
 
 class CameraImageViewPage extends StatefulWidget {
   @override
@@ -11,36 +10,65 @@ class CameraImageViewPage extends StatefulWidget {
 
 class _CameraImageViewPageState extends State<CameraImageViewPage> {
   static final platform = MethodChannel("BokehfyImage");
-  List bokehImagesList = [];
-  var image = <PhotoViewGalleryPageOptions>[];
+  List bokehImagesList = List<String>();
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    var image = <PhotoViewGalleryPageOptions>[];
+    
+    var _currentPageIndex = 0;
+    PageController _pageController = PageController(initialPage: _currentPageIndex);
 
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        title: Text("Chromy Images"),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.share),
+            onPressed: () {
+              // TODO: Implement share app
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: () {
+              var reversedList = [];
+              for(var images in bokehImagesList.reversed) {
+                reversedList.add(images);
+              }
+
+              print("Deleting ${reversedList[_currentPageIndex]}");
+              File(reversedList[_currentPageIndex]).delete();
+              setState(() {
+                var setting_state = true;
+                _pageController = PageController(initialPage: _currentPageIndex -1);
+              });
+            },
+          )
+        ],
+      ),
       backgroundColor: Colors.black,
         body: FutureBuilder(
       future: _getBokehImages(),
       builder: (BuildContext context, AsyncSnapshot asyncshapshot) {
-        var opt = <PhotoViewGalleryPageOptions>[];
+        var opt = <Widget>[];
         bokehImagesList.sort();
         Iterable reversedImagesList = bokehImagesList.reversed;
         if (bokehImagesList.length > 0) {
           for (var images in reversedImagesList) {
-            opt.add(PhotoViewGalleryPageOptions(
-                imageProvider: FileImage(File(images))));
+            opt.add(Container(child: Image(image: FileImage(File(images)),),));
           }
-          return PhotoViewGallery(
-            pageOptions: opt,
-            loadingChild: Text("Image Loading..."),
-            enableRotation: false,
+          return PageView(
+            controller: _pageController,
+            children: opt,
+            onPageChanged: (index) {
+              _currentPageIndex = index;
+            } ,
           );
         } else {
           return Container(

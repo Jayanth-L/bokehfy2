@@ -11,7 +11,7 @@ class ChromifyImageViewPage extends StatefulWidget {
 
 class _ChromifyImageViewPageState extends State<ChromifyImageViewPage> {
   static final platform = MethodChannel("BokehfyImage");
-  List bokehImagesList = [];
+  List bokehImagesList = List<String>();
   var image = <PhotoViewGalleryPageOptions>[];
 
   @override
@@ -22,25 +22,55 @@ class _ChromifyImageViewPageState extends State<ChromifyImageViewPage> {
 
   @override
   Widget build(BuildContext context) {
-    var image = <PhotoViewGalleryPageOptions>[];
+    
+    var _currentPageIndex = 0;
+    PageController _pageController = PageController(initialPage: _currentPageIndex);
 
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        title: Text("Chromy Images"),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.share),
+            onPressed: () {
+              // TODO: Implement share app
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: () {
+              var reversedList = [];
+              for(var images in bokehImagesList.reversed) {
+                reversedList.add(images);
+              }
+              print('Deleting file ${reversedList[_currentPageIndex]}');
+              File(reversedList[_currentPageIndex]).delete();
+              setState(() {
+                var setting_state = true;
+                _pageController = PageController(initialPage: _currentPageIndex -1);
+              });
+            },
+          )
+        ],
+      ),
       backgroundColor: Colors.black,
         body: FutureBuilder(
       future: _getChromifyImagesImages(),
       builder: (BuildContext context, AsyncSnapshot asyncshapshot) {
-        var opt = <PhotoViewGalleryPageOptions>[];
+        var opt = <Widget>[];
         bokehImagesList.sort();
         Iterable reversedImagesList = bokehImagesList.reversed;
         if (bokehImagesList.length > 0) {
           for (var images in reversedImagesList) {
-            opt.add(PhotoViewGalleryPageOptions(
-                imageProvider: FileImage(File(images))));
+            opt.add(Container(child: Image(image: FileImage(File(images)),),));
           }
-          return PhotoViewGallery(
-            pageOptions: opt,
-            loadingChild: Text("Loading Image..."),
-            enableRotation: false,
+          return PageView(
+            controller: _pageController,
+            children: opt,
+            onPageChanged: (index) {
+              _currentPageIndex = index;
+            },
           );
         } else {
           return Container(

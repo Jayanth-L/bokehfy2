@@ -46,9 +46,10 @@ android {
         versionName flutterVersionName
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        
         ndk {
-            abiFilters "armeabi-v7a"
-        }
+            abiFilters "arm64-v8a"
+        } // this should  be  enabled for to target armv7 or armv8
     }
 
     buildTypes {
