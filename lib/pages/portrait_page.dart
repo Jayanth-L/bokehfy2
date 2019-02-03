@@ -7,14 +7,27 @@ import 'package:flutter/services.dart';
 import 'package:bokehfyapp/widgets/progress_indicator.dart';
 import 'package:bokehfyapp/widgets/all_portraitimagesviewer.dart';
 
-class PortraitPageClass {
+import 'package:flare_flutter/flare_actor.dart';
+
+class PortraitPageClass extends StatefulWidget {
+  @override
+  _PortraitPageClassState createState() => _PortraitPageClassState();
+}
+
+class _PortraitPageClassState extends State<PortraitPageClass> {
   static final platform = MethodChannel("BokehfyImage");
   Color _top_app_bar_color = Colors.blue;
   int _current_bottom_nav_bar_index = 0;
   List bokehImagesList = [];
 
-  BuildContext context;
-  PortraitPageClass({this.context});
+  var _isFlareSucessAnimation = false;
+
+  var isLoadingflareanimation = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return PortraitPage();
+  }
 
   Widget PortraitPage() {
     return ListView(
@@ -57,7 +70,8 @@ class PortraitPageClass {
                             context: context,
                             builder: (BuildContext context) {
                               return AlertDialog(
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0)),
                                 title: Text("Convert to Portrait pic ?"),
                                 content: Text(
                                     "Sure you want to convert to portrait image ?"),
@@ -74,15 +88,47 @@ class PortraitPageClass {
                                       Navigator.of(context).pop();
                                       showDialog(
                                         builder: (BuildContext context) {
+                                          isLoadingflareanimation = true;
                                           _sendImageForBokehfycation(_)
                                               .then((_response) {
                                             print(_response);
+                                            // Navigator.of(context).pop();
+                                            setState(() {
+                                              isLoadingflareanimation = false;
+                                            });
                                             Navigator.of(context).pop();
+                                            showDialog(
+                                                context: context,
+                                                barrierDismissible: false,
+                                                builder: (BuildContext
+                                                    successContext) {
+                                                  return FlareActor(
+                                                    'assets/success.flr',
+                                                    animation: "Untitled",
+                                                    alignment: Alignment.center,
+                                                    callback: (_) {
+                                                      print("Animation Done");
+                                                      Navigator.of(
+                                                              successContext)
+                                                          .pop();
+                                                    },
+                                                  );
+                                                });
+                                            // Introduce flare here
                                           });
-                                          return Center(
-                                              child: Material(
-                                                  color: Colors.transparent,
-                                                  child: DotProgress()));
+                                          return FlareActor(
+                                            isLoadingflareanimation
+                                                ? 'assets/line_circles.flr'
+                                                : 'assets/success.flr',
+                                            alignment: Alignment.center,
+                                            animation: isLoadingflareanimation
+                                                ? "Loading"
+                                                : "Untitled",
+                                            callback: (_) {
+                                              print("The animation completed");
+                                              Navigator.of(context).pop();
+                                            },
+                                          );
                                           //return Center(child: Material(child: Row(children: <Widget>[ CircularProgressIndicator(),Text("Bokehfying", style: TextStyle(color: Colors.black),),], mainAxisSize: MainAxisSize.min,)));
                                         },
                                         context: context,
@@ -106,7 +152,8 @@ class PortraitPageClass {
                 padding: EdgeInsets.all(10.0),
                 child: GestureDetector(
                   child: Card(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0)),
                     elevation: 10.0,
                     child: Container(
                       decoration: BoxDecoration(
@@ -125,11 +172,32 @@ class PortraitPageClass {
                       builder: (BuildContext context) {
                         _getCameraImageToPortraitAndPortrify().then((_) {
                           Navigator.of(context).pop();
+                          showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (BuildContext successContext) {
+                                return FlareActor(
+                                  'assets/success.flr',
+                                  animation: "Untitled",
+                                  callback: (_) {
+                                    print("Success animation done");
+                                    Navigator.of(successContext).pop();
+                                  },
+                                );
+                              });
                         });
-                        return Center(
-                            child: Material(
-                                color: Colors.transparent,
-                                child: DotProgress()));
+                        return FlareActor(
+                          isLoadingflareanimation
+                              ? 'assets/line_circles.flr'
+                              : 'assets/success.flr',
+                          alignment: Alignment.center,
+                          animation:
+                              isLoadingflareanimation ? "Loading" : "Untitled",
+                          callback: (_) {
+                            print("The animation completed");
+                            Navigator.of(context).pop();
+                          },
+                        );
                         //return Center(child: Material(child: Row(children: <Widget>[ CircularProgressIndicator(),Text("Bokehfying", style: TextStyle(color: Colors.black),),], mainAxisSize: MainAxisSize.min,)));
                       },
                       context: context,

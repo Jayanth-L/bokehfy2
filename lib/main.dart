@@ -51,8 +51,8 @@ class _BokehfyAppPageState extends State<BokehfyAppPage> with AutomaticKeepAlive
   Widget build(BuildContext context) {
 
     pages = [
-      PortraitPageClass(context: context).PortraitPage(), 
-      ChromePortraitPageClass(context: context).ChromportraitPage(),
+      PortraitPageClass(), 
+      ChromePortraitPageClass(),
       //ProModePageClass(context: context).ProModePage(),
       AboutPageClass(context: context).AboutPage()
     ];

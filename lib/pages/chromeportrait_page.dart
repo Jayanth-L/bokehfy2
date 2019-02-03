@@ -7,14 +7,24 @@ import 'package:bokehfyapp/widgets/chromify_camera_imageview.dart';
 import 'package:bokehfyapp/widgets/chromify_imageview.dart';
 import 'package:bokehfyapp/widgets/all_chromifyimageviewer.dart';
 
-class ChromePortraitPageClass {
+import 'package:flare_flutter/flare_actor.dart';
+
+class ChromePortraitPageClass extends StatefulWidget {
+  @override
+  _ChromePortraitPageClassState createState() =>
+      _ChromePortraitPageClassState();
+}
+
+class _ChromePortraitPageClassState extends State<ChromePortraitPageClass> {
   static final platform = MethodChannel("BokehfyImage");
   Color _top_app_bar_color = Colors.blue;
   int _current_bottom_nav_bar_index = 0;
   List bokehImagesList = [];
 
-  BuildContext context;
-  ChromePortraitPageClass({this.context});
+  @override
+  Widget build(BuildContext context) {
+    return ChromportraitPage();
+  }
 
   Widget ChromportraitPage() {
     return ListView(
@@ -57,7 +67,8 @@ class ChromePortraitPageClass {
                             context: context,
                             builder: (BuildContext context) {
                               return AlertDialog(
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0)),
                                 title:
                                     Text("Convert to MonoChrome Color pic ?"),
                                 content: Text(
@@ -79,11 +90,34 @@ class ChromePortraitPageClass {
                                               .then((_response) {
                                             print(_response);
                                             Navigator.of(context).pop();
+                                            showDialog(
+                                                context: context,
+                                                barrierDismissible: false,
+                                                builder: (BuildContext
+                                                    successContext) {
+                                                  return FlareActor(
+                                                    'assets/success.flr',
+                                                    animation: "Untitled",
+                                                    callback: (_) {
+                                                      print(
+                                                          "Success animation done");
+                                                      Navigator.of(
+                                                              successContext)
+                                                          .pop();
+                                                    },
+                                                  );
+                                                });
                                           });
-                                          return Center(
-                                              child: Material(
-                                                  color: Colors.transparent,
-                                                  child: DotProgress()));
+                                          return FlareActor(
+                                            'assets/line_circles.flr',
+                                            alignment: Alignment.center,
+                                            animation: "Loading",
+                                            callback: (_) {
+                                              print(
+                                                  "The loading animation completed");
+                                              Navigator.of(context).pop();
+                                            },
+                                          );
                                           //return Center(child: Material(child: Row(children: <Widget>[ CircularProgressIndicator(),Text("Bokehfying", style: TextStyle(color: Colors.black),),], mainAxisSize: MainAxisSize.min,)));
                                         },
                                         context: context,
@@ -127,11 +161,26 @@ class ChromePortraitPageClass {
                       builder: (BuildContext context) {
                         _getCameraImageToChromyAndChromify().then((_) {
                           Navigator.of(context).pop();
+                          showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (BuildContext successContext) {
+                                return FlareActor(
+                                  'assets/success.flr',
+                                  animation: "Untitled",
+                                  callback: (_) {
+                                    print("Success animation done");
+                                    Navigator.of(successContext).pop();
+                                  },
+                                );
+                              });
                         });
-                        return Center(
-                            child: Material(
-                                color: Colors.transparent,
-                                child: DotProgress()));
+                        return FlareActor('assets/line_circles.flr',
+                            alignment: Alignment.center,
+                            animation: "Loading", callback: (_) {
+                          print("The loading animation completed");
+                          Navigator.of(context).pop();
+                        });
                         //return Center(child: Material(child: Row(children: <Widget>[ CircularProgressIndicator(),Text("Bokehfying", style: TextStyle(color: Colors.black),),], mainAxisSize: MainAxisSize.min,)));
                       },
                       context: context,
@@ -264,72 +313,3 @@ class ChromePortraitPageClass {
     return response;
   }
 }
-
-/*
-print("tapped");
-                          // TODO:// Here add new image action goes i.e; intent_action_get native code
-                          _getImageToChromify().then((_) {
-                            // Got the Image path
-                            print("image_path: " + _);
-                            // Now send it for the bokehfycation
-
-                            // show the dialog
-                            if (_ != "") {
-                              showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: Text("Convert to MonoChrome Color pic ?"),
-                                      content: Text(
-                                          "Sure you want to convert to MonoChrome Color image ?"),
-                                      actions: <Widget>[
-                                        FlatButton(
-                                          child: Text("No"),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                        ),
-                                        FlatButton(
-                                          child: Text("Yes"),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                            showDialog(
-                                              builder: (BuildContext context) {
-                                                _sendImageForChromifycation(_)
-                                                    .then((_response) {
-                                                  print(_response);
-                                                  Navigator.of(context).pop();
-                                                });
-                                                return Center(
-                                                    child: Material(
-                                                        color:
-                                                            Colors.transparent,
-                                                        child: DotProgress()));
-                                                //return Center(child: Material(child: Row(children: <Widget>[ CircularProgressIndicator(),Text("Bokehfying", style: TextStyle(color: Colors.black),),], mainAxisSize: MainAxisSize.min,)));
-                                              },
-                                              context: context,
-                                              barrierDismissible: false,
-                                            );
-                                          },
-                                        )
-                                      ],
-                                    );
-                                  });
-                            }
-                          }); */
-
-/*
- showDialog(
-                              builder: (BuildContext context) {
-                                 _getCameraImageToChromyAndChromify().then((_) {
-                                   Navigator.of(context).pop();
-                                  });
-                                return Center(
-                                    child: Material(
-                                        color: Colors.transparent,
-                                        child: DotProgress()));
-                                //return Center(child: Material(child: Row(children: <Widget>[ CircularProgressIndicator(),Text("Bokehfying", style: TextStyle(color: Colors.black),),], mainAxisSize: MainAxisSize.min,)));
-                              },
-                              context: context,
-                              barrierDismissible: false,
-                            ); */

@@ -26,6 +26,9 @@ dependencies:
   carousel_pro: ^0.0.13
   path_provider: ^0.5.0
 
+  # Flare dependencies
+  flare_flutter: ^1.2.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -42,6 +45,10 @@ flutter:
     - assets/img3.jpg
     - assets/img4.jpg
     - assets/img5.jpg
+    # Flare assets
+    - assets/success.flr
+    - assets/fail.flr
+    - assets/line_circles.flr
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
