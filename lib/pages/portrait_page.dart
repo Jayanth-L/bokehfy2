@@ -172,7 +172,8 @@ class _PortraitPageClassState extends State<PortraitPageClass> {
                       builder: (BuildContext context) {
                         _getCameraImageToPortraitAndPortrify().then((_) {
                           Navigator.of(context).pop();
-                          showDialog(
+                          if(_ == "success") {
+                            showDialog(
                               context: context,
                               barrierDismissible: false,
                               builder: (BuildContext successContext) {
@@ -185,6 +186,7 @@ class _PortraitPageClassState extends State<PortraitPageClass> {
                                   },
                                 );
                               });
+                          }
                         });
                         return FlareActor(
                           isLoadingflareanimation

@@ -161,7 +161,8 @@ class _ChromePortraitPageClassState extends State<ChromePortraitPageClass> {
                       builder: (BuildContext context) {
                         _getCameraImageToChromyAndChromify().then((_) {
                           Navigator.of(context).pop();
-                          showDialog(
+                          if(_ == "success") {
+                            showDialog(
                               context: context,
                               barrierDismissible: false,
                               builder: (BuildContext successContext) {
@@ -174,6 +175,7 @@ class _ChromePortraitPageClassState extends State<ChromePortraitPageClass> {
                                   },
                                 );
                               });
+                          }
                         });
                         return FlareActor('assets/line_circles.flr',
                             alignment: Alignment.center,

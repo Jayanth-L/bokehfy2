@@ -322,7 +322,7 @@ class MainActivity: FlutterActivity() {
                     return@AsyncHandler true
                 }, this, pendingIntentnResult).execute()
             } catch (e: java.lang.Exception) {
-                pendingIntentnResult.success("success")
+                pendingIntentnResult.success("failure")
                 e.printStackTrace()
             }
 
@@ -346,7 +346,7 @@ class MainActivity: FlutterActivity() {
                     return@AsyncHandler true
                 }, this, pendingIntentnResult).execute()
             } catch (e: java.lang.Exception) {
-                pendingIntentnResult.success("success")
+                pendingIntentnResult.success("false")
                 e.printStackTrace()
             }
         }
