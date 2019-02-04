@@ -1,215 +1,341 @@
 import 'package:flutter/material.dart';
+import 'main_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 
-import 'pages/portrait_page.dart';
-import 'pages/chromeportrait_page.dart';
-import 'pages/about_page.dart';
-import 'helpers/privacy_policy.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:share/share.dart';
+void main() => runApp(MyBokehfyApp());
 
-void main() => runApp(BokehfyApp());
-
-class BokehfyApp extends StatelessWidget {
+class MyBokehfyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: "Intro slider",
       debugShowCheckedModeBanner: false,
-      title: "Bokehfy",
-      theme: ThemeData(primarySwatch: Colors.blue, brightness: Brightness.light),
-      home: BokehfyAppPage(),
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: IntroSlider(),
     );
   }
 }
 
-class BokehfyAppPage extends StatefulWidget {
+class IntroSlider extends StatefulWidget {
   @override
-  _BokehfyAppPageState createState() => _BokehfyAppPageState();
+  _IntroSliderState createState() => _IntroSliderState();
 }
 
-class _BokehfyAppPageState extends State<BokehfyAppPage> with AutomaticKeepAliveClientMixin {
-
-  List<Widget> pages;
-  int _current_page_index = 0;
-  var _currentSelectedPage = 0;
-
-  var _fadeOutvisibility = true;
-
-  TabController _tabController;
-
-
+class _IntroSliderState extends State<IntroSlider> {
   static final platform = MethodChannel("BokehfyImage");
-  int _current_bottom_nav_bar_index = 0;
-  List bokehImagesList = [];
+
+  bool _isTheAppFirstTime;
+  var pages = [Page1(), Page2(), Page3()];
+
+  var _isPageVisible = true;
+  var _currentPage = 0;
+
+  var _isNextButtonEnabled = true;
 
   @override
-  void dispose() {
-    super.dispose();
-    _tabController.dispose();
+  void initState() {
+    super.initState();
+    _isFirstTimeAndPermission().then((_) {
+      if (_ == "true") {
+        setState(() {
+          this._isTheAppFirstTime = true;
+        });
+      } else {
+        setState(() {
+          _isTheAppFirstTime = false;
+        });
+      }
+    });
   }
+
   @override
   Widget build(BuildContext context) {
-
-    pages = [
-      PortraitPageClass(), 
-      ChromePortraitPageClass(),
-      //ProModePageClass(context: context).ProModePage(),
-      AboutPageClass(context: context).AboutPage()
-    ];
-
-     //_tabController = TabController(vsync: this, length: pages.length);
-
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
+    if (_isTheAppFirstTime == null) {
+      return Container(
+        color: Colors.white,
+      );
+    } else if (_isTheAppFirstTime) {
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          title: Text(
+            "BOKEHFY",
+            style: TextStyle(color: Colors.black),
+          ),
+          centerTitle: true,
+          elevation: 0.0,
+        ),
         backgroundColor: Colors.white,
-        title: Text(
-          "BOKEHFY",
-          style: TextStyle(color: Colors.black),
-        ),
-        centerTitle: true,
-        leading: IconButton(
-          icon: Icon(Icons.menu),
-          color: Colors.black,
-          onPressed: () {
-            showModalBottomSheet(
-              context: context,
-              builder: (BuildContext context) => _openDrawer(),
-            );
-          },
-        ),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.sentiment_very_satisfied),
-            color: Colors.black,
-            onPressed: () {},
-          )
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-          currentIndex: _current_bottom_nav_bar_index,
-          onTap: (int index) {
-            setState(() {
-              _current_bottom_nav_bar_index = index;
-              _current_page_index = index;
-              // _tabController.animateTo(index);
-              _fadeOutvisibility = false;
-              Future.delayed(Duration(milliseconds: 700), () {
-                setState(() {
-                _currentSelectedPage = index;
-                _fadeOutvisibility = true;
-                });
-              });
-            });
-          },
-          items: [
-            BottomNavigationBarItem(
-                icon: Icon(Icons.person, color: Colors.blue,),
-                title: Text("Portrait", style: TextStyle(color: Colors.blue),),
-                backgroundColor: Colors.white),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.colorize, color: Colors.green,),
-                title: Text("Highlight", style: TextStyle(color: Colors.green)),
-                backgroundColor: Colors.white),
-            /*BottomNavigationBarItem(
-                icon: Icon(Icons.portrait, color: Colors.orange,),
-                title: Text("Pro mode", style: TextStyle(color: Colors.orange)),
-                backgroundColor: Colors.white), */
-            BottomNavigationBarItem(
-                icon: Icon(Icons.info, color: Colors.deepPurple,),
-                title: Text("About", style: TextStyle(color: Colors.deepPurple)),
-                backgroundColor: Colors.white)
-          ]),
-      body: AnimatedOpacity(
-        child: pages[_currentSelectedPage],
-        duration: Duration(milliseconds: 700),
-        opacity: _fadeOutvisibility ? 1.0 : 0.0,
-      ),
-      
-       /*TabBarView(
-        controller: _tabController,
-        // physics: NeverScrollableScrollPhysics(), // This diables sliding pages chane stuff.
-        children: pages,
-      ) */
-    );
-  }
-
-  Widget _openDrawer() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        ListTile(
-          leading: Icon(Icons.home, color: Colors.green,),
-          title: Text("About"),
-          onTap: () {
-            Navigator.of(context).pop();
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: Text("Magically convert your pics to Portrait pics!"),
-                  actions: <Widget>[
-                    FlatButton(
-                      child: Text("Wow!"),
-                      onPressed: () => Navigator.of(context).pop()
-                    ),
-                    FlatButton(
-                      child: Text("Good"),
-                      onPressed: () => Navigator.of(context).pop()
-                    )
-                  ],
-                );
-              }
-            );
-          },
-        ),
-        ListTile(
-          leading: Icon(Icons.security, color: Colors.orange,),
-          title: Text("Privacy Policy"),
-          onTap: () {
-            Navigator.of(context).pop();
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (BuildContext context) => PrivacyPolicyPage()
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: <Widget>[
+              Expanded(
+                child: Container(
+                  color: Colors.white,
+                  child: AnimatedOpacity(
+                      duration: Duration(seconds: 1),
+                      opacity: _isPageVisible ? 1.0 : 0.0,
+                      child: pages[_currentPage]),
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: <Widget>[
+                  MaterialButton(
+                    child: Icon(Icons.arrow_back_ios),
+                    onPressed: () {
+                      print("Pressed current page");
+                      if (_currentPage > 0) {
+                        setState(() {
+                          _isPageVisible = false;
+                          Future.delayed(Duration(seconds: 1), () {
+                            setState(() {
+                              _currentPage = _currentPage - 1;
+                              _isPageVisible = true;
+                            });
+                          });
+                        });
+                      }
+                      print("going back");
+                    },
+                  ),
+                  MaterialButton(
+                    child: Icon(Icons.send),
+                    onPressed: () {
+                      if (_isNextButtonEnabled) {
+                        _isNextButtonEnabled = false;
+                        if (_currentPage == 1) {
+                          _checkPermission().then((_) {
+                            if (_ == "true") {
+                              setState(() {
+                                _isPageVisible = false;
+                                Future.delayed(Duration(seconds: 1), () {
+                                  setState(() {
+                                    _currentPage = _currentPage + 1;
+                                    _isPageVisible = true;
+                                    _isNextButtonEnabled = true;
+                                  });
+                                });
+                              }
+                              
+                              );} else {
+                                _isNextButtonEnabled = true;
+                              }
+                          });
+                        } else if (_currentPage < 2) {
+                          setState(() {
+                            _isPageVisible = false;
+                            Future.delayed(Duration(seconds: 1), () {
+                              setState(() {
+                                _currentPage = _currentPage + 1;
+                                _isPageVisible = true;
+                                _isNextButtonEnabled = true;
+                              });
+                            });
+                          });
+                        } else {
+                          _setTheInitFlag().then((_) {
+                            showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (BuildContext progressContext) {
+                                  _decryptTensorflowModel().then((_) {
+                                    if (_ == "success") {
+                                      Navigator.of(context).pop();
+                                      Navigator.of(context).pushReplacement(
+                                          MaterialPageRoute(
+                                              builder: (BuildContext context) =>
+                                                  BokehfyApp()));
+                                    }
+                                  });
+                                  return Center(
+                                      child: Container(
+                                    child: CircularProgressIndicator(),
+                                    width: 50.0,
+                                    height: 50.0,
+                                  ));
+                                });
+                          });
+                        }
+                        print("Pressed");
+                      }
+                    },
+                  )
+                ],
               )
-            );
-          },
+            ],
+          ),
         ),
-        ListTile(
-          leading: Icon(Icons.share, color: Colors.blue,),
-          title: Text("Share App"),
-          onTap: () {
-            Navigator.of(context).pop();
-
-            Share.share("Checkout the AI Powered Bokeh converter app");
-            // TODO:// Implement share app.
-          },
-        ),
-        ListTile(
-          leading: Icon(Icons.thumb_up, color: Colors.deepPurple),
-          title: Text("Rate us :)"),
-          onTap: () {
-            Navigator.of(context).pop();
-            _launchUrl("market://details?id=com.bitcryptorapp.jayanthl.bitcryptorapp");
-          },
-        )
-      ],
-    );
-  }
-
-  void _launchUrl(url) async {
-    try {
-      if(await canLaunch(url)) {
-        await launch(url);
-      }
-    } catch(exception, stacktrace) {
-      print(exception);
-      print(stacktrace);
+      );
+    } else {
+      return BokehfyApp();
     }
   }
 
+  Future<String> _decryptTensorflowModel() async {
+    var res = await platform
+        .invokeMethod("decryptTensorflowModel", {"decrypt": "decrypt"});
+    return res;
+  }
+
+  Future<String> _checkPermission() async {
+    var res = await platform
+        .invokeMethod('checkStoragePermission', {"check": "check"});
+    return res;
+  }
+
+  Future<String> _isFirstTimeAndPermission() async {
+
+    // implementing the below with the native code
+
+    var firstTime = await platform.invokeMethod("isFirstTimeAndCheckPermission", {"firstpermission": "firstpermission"});
+    return firstTime;
+
+    /*
+    bool firstTime;
+    SharedPreferences _preferences = await SharedPreferences.getInstance();
+    bool notFirst = _preferences.getBool('first') ?? false;
+    if (notFirst) {
+      print("not first time");
+      firstTime = false;
+    } else {
+      print('firstTime');
+      firstTime = true;
+    }
+    return firstTime; */
+  }
+
+  Future<String> _setTheInitFlag() async {
+    SharedPreferences _preferences = await SharedPreferences.getInstance();
+    await _preferences.setBool('first', true);
+    await _preferences.commit();
+    return "done";
+  }
+}
+
+class Page1 extends StatefulWidget {
   @override
-  // TODO: implement wantKeepAlive
-  bool get wantKeepAlive => true;
+  _Page1State createState() => _Page1State();
+}
+
+class _Page1State extends State<Page1> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Icon(Icons.card_giftcard, size: 100.0, color: Colors.black),
+            Text(
+              "BOKEHFY APP",
+              style: TextStyle(fontSize: 17.0, color: Colors.black),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class Page2 extends StatefulWidget {
+  @override
+  _Page2State createState() => _Page2State();
+}
+
+class _Page2State extends State<Page2> {
+  static final platform = MethodChannel("BokehfyImage");
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Icon(Icons.local_car_wash, size: 100.0, color: Colors.black),
+            Text(
+              "Magically convert to Portrait photos with AI",
+              style: TextStyle(
+                fontSize: 17.0,
+                color: Colors.black,
+              ),
+            ),
+            MaterialButton(
+              child: Text(
+                "Give Permission",
+                style: TextStyle(color: Colors.black),
+              ),
+              elevation: 5.0,
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text("Storage Permission"),
+                        content: Text(
+                            "We need storage permission to be able to write images to disk"),
+                        actions: <Widget>[
+                          MaterialButton(
+                            child: Text("No"),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          RaisedButton(
+                            child: Text(
+                              "Yes",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            onPressed: () {
+                              _getStoragePermission();
+                              Navigator.of(context).pop();
+                            },
+                          )
+                        ],
+                      );
+                    });
+              },
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<String> _getStoragePermission() async {
+    var res = await platform
+        .invokeMethod("getStoragePermission", {"permission": "permission"});
+    return res;
+  }
+}
+
+class Page3 extends StatefulWidget {
+  @override
+  _Page3State createState() => _Page3State();
+}
+
+class _Page3State extends State<Page3> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Icon(Icons.cake, size: 100.0, color: Colors.black),
+            Text(
+              "Happy Birthday",
+              style: TextStyle(fontSize: 17.0, color: Colors.black),
+            )
+          ],
+        ),
+      ),
+    );
+  }
 }

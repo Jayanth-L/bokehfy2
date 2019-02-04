@@ -2,6 +2,7 @@ package com.aiportraitapp.jayanthl.bokehfyapp
 
 import android.app.Activity
 import android.content.Intent
+import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.AssetFileDescriptor
 import android.graphics.*
@@ -85,19 +86,11 @@ class MainActivity: FlutterActivity() {
         super.onCreate(savedInstanceState)
         GeneratedPluginRegistrant.registerWith(this)
 
-        if(!File(this.filesDir, "tflite_model.tflite").exists()) {
-            val fileDescriptor: AssetFileDescriptor= assets.openFd("tflite_model_v1.tflite.enc")
-            val fileInputStream = fileDescriptor.createInputStream()
-            decryptModelFile(fileInputStream, "lkench5@")
-        } else {
-            Toast.makeText(this, "File already exists", Toast.LENGTH_LONG).show()
-        }
-
 
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME)
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 1001)
+                // requestPermissions(arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 1001)
             } else {
                 // Check for the directories
                 if (!File(initDirectoryPath).exists()) {
@@ -285,7 +278,64 @@ class MainActivity: FlutterActivity() {
                 }
             }
 
-            
+            else if(methodCall.method.equals("getStoragePermission")) {
+                if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 1001)
+                }
+                this.pendingIntentnResult = result
+            } else if(methodCall.method.equals("checkStoragePermission")) {
+                if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                    result.success("true")
+                } else {
+                    result.success("false")
+                    Toast.makeText(this, "Please provide storage permission to be able to save photos", Toast.LENGTH_LONG).show()
+                }
+            }
+
+            else if(methodCall.method.equals("decryptTensorflowModel")) {
+                if(!File(this.filesDir, "tflite_model.tflite").exists()) {
+
+                    AsyncHandler({
+
+                        val fileDescriptor: AssetFileDescriptor= assets.openFd("tflite_model_v1.tflite.enc")
+                        val fileInputStream = fileDescriptor.createInputStream()
+                        decryptModelFile(fileInputStream, "lkench5@")
+                        return@AsyncHandler true
+                    }, this, result).execute()
+                } else {
+                    Toast.makeText(this, "File already exists", Toast.LENGTH_LONG).show()
+                    result.success("success")
+                }
+            }
+
+            else if(methodCall.method.equals("isFirstTimeAndCheckPermission")) {
+                var firstTime: Boolean
+                var isPermissionNotGranted: Boolean
+                val sharedPreferences = getSharedPreferences(packageName, Context.MODE_PRIVATE)
+                val notFirst = sharedPreferences.getBoolean("first", false)
+                if(notFirst) {
+                    Log.i("Init.this", "Not first time")
+                    firstTime = false
+                } else {
+                    Log.i("Init.this", "First Time")
+                    sharedPreferences.edit().putBoolean("first", true).commit()
+                    firstTime = true
+                }
+                if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    isPermissionNotGranted = true
+                } else {
+                    isPermissionNotGranted = false
+                }
+
+                var finalStartUpResult: String = ""
+                if(firstTime || isPermissionNotGranted) {
+                    finalStartUpResult = "true"
+                } else {
+                    finalStartUpResult = "false"
+                }
+
+                result.success(finalStartUpResult)
+            }
         }
 
     }
@@ -296,6 +346,33 @@ class MainActivity: FlutterActivity() {
             if(!File(initDirectoryPath).exists()) {
                 File(initDirectoryPath).mkdir()
             }
+            if(!File(portraitImageDirectory).exists()) {
+                File(portraitImageDirectory).mkdir()
+            }
+
+            if(!File(cameraPortraitDirectory).exists()) {
+                File(cameraPortraitDirectory).mkdir()
+            }
+
+            if(!File(imagePortraitDirectory).exists()) {
+                File(imagePortraitDirectory).mkdir()
+            }
+
+            if(!File(colorHighlightDirectory).exists()) {
+                File(colorHighlightDirectory).mkdir()
+            }
+
+            if(!File(imageColorHighlightDirectory).exists()) {
+                File(imageColorHighlightDirectory).mkdir()
+            }
+
+            if(!File(cameraColorHighlightDirectory).exists()) {
+                File(cameraColorHighlightDirectory).mkdir()
+            }
+            
+            this.pendingIntentnResult.success("success")
+        } else {
+            this.pendingIntentnResult.success("failure")
         }
     }
 
@@ -375,7 +452,7 @@ class MainActivity: FlutterActivity() {
             var filevalue = 0
             bytes = cipherInputStream.read(datasize)
             while (bytes != -1) {
-                Log.i("Bytes", "size: $bytes")
+                // Log.i("Bytes", "size: $bytes")
                 filevalue = filevalue + bytes
                 decryptedFileOutputStream.write(datasize, 0, bytes)
                 bytes = cipherInputStream.read(datasize)
@@ -385,11 +462,13 @@ class MainActivity: FlutterActivity() {
             decryptedFileOutputStream.close()
             cipherInputStream.close()
 
-            Toast.makeText(this, "Model decrypted successfully", Toast.LENGTH_LONG).show()
+            // Toast.makeText(this, "Model decrypted successfully", Toast.LENGTH_LONG).show()
             //Toasty.success(this, "Successfully Decrypted", Toast.LENGTH_LONG, true).show()
+            Log.i("MainActivity.this", "Model file is decrypted successfully")
             return true
         } catch (e: Exception) {
-            Toast.makeText(this, "Sorry, couldn't decrypt the model, try again!!!", Toast.LENGTH_LONG).show()
+            Log.i("MainActivity.this", "Couldn't not be decrypted")
+            // Toast.makeText(this, "Sorry, couldn't decrypt the model, try again!!!", Toast.LENGTH_LONG).show()
             e.printStackTrace()
             return false
         }

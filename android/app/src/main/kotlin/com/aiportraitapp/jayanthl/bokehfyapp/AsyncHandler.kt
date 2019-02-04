@@ -23,7 +23,7 @@ class AsyncHandler(val handler: () -> Boolean, mContext: Context, pendingIntentR
         super.onPostExecute(result)
 
         if (result!!) {
-            Toast.makeText(mContext, "BokehFied", Toast.LENGTH_LONG).show()
+            // Toast.makeText(mContext, "BokehFied", Toast.LENGTH_LONG).show()
             pendingIntentResult.success("success")
         }
     }
