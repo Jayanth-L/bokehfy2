@@ -146,7 +146,9 @@ class _BokehfyAppPageState extends State<BokehfyAppPage> with AutomaticKeepAlive
               context: context,
               builder: (BuildContext context) {
                 return AlertDialog(
-                  title: Text("Magically convert your pics to Portrait pics!"),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                  title: Text("Magically convert your pics to Portrait pics!", style: TextStyle(fontSize: 17.0),),
+                  content: Text("Let the AI convert your pic to bokeh images :)"),
                   actions: <Widget>[
                     FlatButton(
                       child: Text("Wow!"),

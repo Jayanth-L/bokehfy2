@@ -336,6 +336,22 @@ class MainActivity: FlutterActivity() {
 
                 result.success(finalStartUpResult)
             }
+
+            else if(methodCall.method.equals("shareImageFile")) {
+                val shareImagePath = arguments.get("imagepath").toString()
+                var shareImageFile = Intent()
+                shareImageFile.setAction(Intent.ACTION_SEND)
+                shareImageFile.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                val photoURI: Uri = FileProvider.getUriForFile(this,this.applicationContext.packageName + ".com.aiportraitapp.jayanthl.bokehfyapp.provider",File(shareImagePath))
+                shareImageFile.setType("image/*")
+                shareImageFile.putExtra(Intent.EXTRA_STREAM, photoURI)
+                try {
+                    startActivity(shareImageFile)
+                    result.success("success")
+                } catch(e: Exception) {
+                    result.success("failure")
+                }
+            }
         }
 
     }

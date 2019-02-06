@@ -33,7 +33,11 @@ class _ImageViewPageState extends State<ImageViewPage> {
           IconButton(
             icon: Icon(Icons.share),
             onPressed: () {
-              // TODO: Implement share app
+              var reversedList = [];
+              for (var images in bokehImagesList.reversed) {
+                reversedList.add(images);
+              }
+              _shareImageFile(reversedList[_currentPageIndex]);
             },
           ),
           IconButton(
@@ -89,5 +93,10 @@ class _ImageViewPageState extends State<ImageViewPage> {
     bokehImagesList.sort();
     Iterable reversedImagesList = bokehImagesList.reversed;
     return reversedImagesList.toList();
+  }
+
+  Future<String> _shareImageFile(imagepath) async {
+    var res = await platform.invokeMethod("shareImageFile", {"imagepath": imagepath});
+    return res;
   }
 }
