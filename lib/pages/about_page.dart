@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AboutPageClass {
   BuildContext context;
@@ -34,14 +35,16 @@ class AboutPageClass {
                         Padding(
                           padding: const EdgeInsets.only(top: 50.0),
                           child: RaisedButton(
-                            child: Text("Buy me a Coffee  ₹50",
+                            child: Text("Rate us :-)",
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 17.0)),
                             color: Colors.blue,
                             textColor: Colors.white,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(35.0)),
-                            onPressed: () {},
+                            onPressed: () {
+                              _launchTheUrl("market://details?id=com.bitcryptorapp.jayanthl.bitcryptorapp");
+                            },
                           ),
                         )
                       ],
@@ -52,5 +55,16 @@ class AboutPageClass {
         ],
       ),
     ));
+  }
+
+  Future _launchTheUrl(url) async {
+    try {
+      if(await canLaunch(url)) {
+        await launch(url);
+      }
+    } catch(exception, stacktrace) {
+      print(exception);
+      print(stacktrace);
+    }
   }
 }
