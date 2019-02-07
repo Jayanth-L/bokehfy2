@@ -229,10 +229,14 @@ class MainActivity: FlutterActivity() {
 
                 AsyncHandler({
 
-                    val imagepath = arguments.get("imagepath").toString()
+                    try {
+                        val imagepath = arguments.get("imagepath").toString()
 
-                    aiConvertToPortrait(imagepath, imagePortraitDirectory)
-                    return@AsyncHandler true
+                        aiConvertToPortrait(imagepath, imagePortraitDirectory)
+                        return@AsyncHandler true
+                    } catch(e: java.lang.Exception) {
+                        return@AsyncHandler false
+                    }
                 }, this, result).execute()
             }
 
@@ -246,11 +250,14 @@ class MainActivity: FlutterActivity() {
                 startActivityForResult(pickImageIntent, PICK_IMAGE_FOR_CHROMIFYCATION_REQUESTCODE)
             } else if(methodCall.method.equals("sendImageForchromifycation")) {
                 AsyncHandler({
+                    try {
+                        val imagepath = arguments.get("imagepath").toString()
 
-                    val imagepath = arguments.get("imagepath").toString()
-
-                    aiConvertToMonoChrome(imagepath, imageColorHighlightDirectory)
-                    return@AsyncHandler true
+                        aiConvertToMonoChrome(imagepath, imageColorHighlightDirectory)
+                        return@AsyncHandler true
+                    } catch(e: java.lang.Exception) {
+                        return@AsyncHandler false
+                    }
                 }, this, result).execute()
             } else if(methodCall.method.equals("getCameraImagepathToPortraitAndChromify")) {
                 this.pendingIntentnResult = result

@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+/**
+ * author: Jayanrh L
+ * email: jayanthl@protonmail.com
+ */
+
 class AboutPageClass {
   BuildContext context;
   AboutPageClass({this.context});

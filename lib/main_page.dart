@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import 'pages/portrait_page.dart';
 import 'pages/chromeportrait_page.dart';
 import 'pages/about_page.dart';
 import 'helpers/privacy_policy.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share/share.dart';
+
+/**
+ * author: Jayanrh L
+ * email: jayanthl@protonmail.com
+ */
 
 class BokehfyApp extends StatelessWidget {
   @override

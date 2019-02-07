@@ -1,13 +1,16 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:bokehfyapp/widgets/image_viewer.dart';
 import 'package:bokehfyapp/widgets/camera_imageviewer.dart';
 import 'package:flutter/services.dart';
 import 'package:bokehfyapp/widgets/progress_indicator.dart';
 import 'package:bokehfyapp/widgets/all_portraitimagesviewer.dart';
-
 import 'package:flare_flutter/flare_actor.dart';
+
+/**
+ * author: Jayanrh L
+ * email: jayanthl@protonmail.com
+ */
 
 class PortraitPageClass extends StatefulWidget {
   @override
@@ -92,28 +95,36 @@ class _PortraitPageClassState extends State<PortraitPageClass> {
                                           _sendImageForBokehfycation(_)
                                               .then((_response) {
                                             print(_response);
-                                            // Navigator.of(context).pop();
-                                            setState(() {
-                                              isLoadingflareanimation = false;
-                                            });
-                                            Navigator.of(context).pop();
-                                            showDialog(
-                                                context: context,
-                                                barrierDismissible: false,
-                                                builder: (BuildContext
-                                                    successContext) {
-                                                  return FlareActor(
-                                                    'assets/success.flr',
-                                                    animation: "Untitled",
-                                                    alignment: Alignment.center,
-                                                    callback: (_) {
-                                                      print("Animation Done");
-                                                      Navigator.of(
-                                                              successContext)
-                                                          .pop();
-                                                    },
-                                                  );
-                                                });
+                                            if (_response == "success") {
+                                              setState(() {
+                                                isLoadingflareanimation = false;
+                                              });
+                                              Navigator.of(context).pop();
+                                              showDialog(
+                                                  context: context,
+                                                  barrierDismissible: false,
+                                                  builder: (BuildContext
+                                                      successContext) {
+                                                    return FlareActor(
+                                                      'assets/success.flr',
+                                                      animation: "Untitled",
+                                                      alignment:
+                                                          Alignment.center,
+                                                      callback: (_) {
+                                                        print("Animation Done");
+                                                        Navigator.of(
+                                                                successContext)
+                                                            .pop();
+                                                      },
+                                                    );
+                                                  });
+                                            } else {
+                                              try {
+                                                Navigator.of(context).pop();
+                                              } catch (e, s) {
+
+                                              }
+                                            }
                                             // Introduce flare here
                                           });
                                           return FlareActor(
@@ -172,20 +183,20 @@ class _PortraitPageClassState extends State<PortraitPageClass> {
                       builder: (BuildContext context) {
                         _getCameraImageToPortraitAndPortrify().then((_) {
                           Navigator.of(context).pop();
-                          if(_ == "success") {
+                          if (_ == "success") {
                             showDialog(
-                              context: context,
-                              barrierDismissible: false,
-                              builder: (BuildContext successContext) {
-                                return FlareActor(
-                                  'assets/success.flr',
-                                  animation: "Untitled",
-                                  callback: (_) {
-                                    print("Success animation done");
-                                    Navigator.of(successContext).pop();
-                                  },
-                                );
-                              });
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (BuildContext successContext) {
+                                  return FlareActor(
+                                    'assets/success.flr',
+                                    animation: "Untitled",
+                                    callback: (_) {
+                                      print("Success animation done");
+                                      Navigator.of(successContext).pop();
+                                    },
+                                  );
+                                });
                           }
                         });
                         return FlareActor(

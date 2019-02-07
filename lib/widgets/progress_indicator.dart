@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/animation.dart';
 
+/**
+ * author: Jayanrh L
+ * email: jayanthl@protonmail.com
+ */
+
 class _JumpingDot extends AnimatedWidget {
   final Color color;
   final double fontSize;

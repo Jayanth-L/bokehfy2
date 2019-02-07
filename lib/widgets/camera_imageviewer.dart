@@ -1,7 +1,11 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+/**
+ * author: Jayanrh L
+ * email: jayanthl@protonmail.com
+ */
 
 class CameraImageViewPage extends StatefulWidget {
   @override

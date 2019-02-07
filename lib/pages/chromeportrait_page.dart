@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:bokehfyapp/widgets/image_viewer.dart';
 import 'package:flutter/services.dart';
 import 'package:bokehfyapp/widgets/progress_indicator.dart';
-
 import 'package:bokehfyapp/widgets/chromify_camera_imageview.dart';
 import 'package:bokehfyapp/widgets/chromify_imageview.dart';
 import 'package:bokehfyapp/widgets/all_chromifyimageviewer.dart';
-
 import 'package:flare_flutter/flare_actor.dart';
+
+/**
+ * author: Jayanrh L
+ * email: jayanthl@protonmail.com
+ */
 
 class ChromePortraitPageClass extends StatefulWidget {
   @override
@@ -88,25 +91,33 @@ class _ChromePortraitPageClassState extends State<ChromePortraitPageClass> {
                                         builder: (BuildContext context) {
                                           _sendImageForChromifycation(_)
                                               .then((_response) {
-                                            print(_response);
-                                            Navigator.of(context).pop();
-                                            showDialog(
-                                                context: context,
-                                                barrierDismissible: false,
-                                                builder: (BuildContext
-                                                    successContext) {
-                                                  return FlareActor(
-                                                    'assets/success.flr',
-                                                    animation: "Untitled",
-                                                    callback: (_) {
-                                                      print(
-                                                          "Success animation done");
-                                                      Navigator.of(
-                                                              successContext)
-                                                          .pop();
-                                                    },
-                                                  );
-                                                });
+                                            if (_response == "success") {
+                                              print(_response);
+                                              Navigator.of(context).pop();
+                                              showDialog(
+                                                  context: context,
+                                                  barrierDismissible: false,
+                                                  builder: (BuildContext
+                                                      successContext) {
+                                                    return FlareActor(
+                                                      'assets/success.flr',
+                                                      animation: "Untitled",
+                                                      callback: (_) {
+                                                        print(
+                                                            "Success animation done");
+                                                        Navigator.of(
+                                                                successContext)
+                                                            .pop();
+                                                      },
+                                                    );
+                                                  });
+                                            } else {
+                                              try {
+                                                Navigator.of(context).pop();
+                                              } catch(e, s) {
+
+                                              }
+                                            }
                                           });
                                           return FlareActor(
                                             'assets/line_circles.flr',
@@ -161,20 +172,20 @@ class _ChromePortraitPageClassState extends State<ChromePortraitPageClass> {
                       builder: (BuildContext context) {
                         _getCameraImageToChromyAndChromify().then((_) {
                           Navigator.of(context).pop();
-                          if(_ == "success") {
+                          if (_ == "success") {
                             showDialog(
-                              context: context,
-                              barrierDismissible: false,
-                              builder: (BuildContext successContext) {
-                                return FlareActor(
-                                  'assets/success.flr',
-                                  animation: "Untitled",
-                                  callback: (_) {
-                                    print("Success animation done");
-                                    Navigator.of(successContext).pop();
-                                  },
-                                );
-                              });
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (BuildContext successContext) {
+                                  return FlareActor(
+                                    'assets/success.flr',
+                                    animation: "Untitled",
+                                    callback: (_) {
+                                      print("Success animation done");
+                                      Navigator.of(successContext).pop();
+                                    },
+                                  );
+                                });
                           }
                         });
                         return FlareActor('assets/line_circles.flr',

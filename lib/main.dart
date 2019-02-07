@@ -3,6 +3,11 @@ import 'main_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 
+/**
+ * author: Jayanrh L
+ * email: jayanthl@protonmail.com
+ */
+
 void main() => runApp(MyBokehfyApp());
 
 class MyBokehfyApp extends StatelessWidget {

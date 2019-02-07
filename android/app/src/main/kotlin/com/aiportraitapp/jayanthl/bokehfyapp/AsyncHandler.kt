@@ -25,6 +25,9 @@ class AsyncHandler(val handler: () -> Boolean, mContext: Context, pendingIntentR
         if (result!!) {
             // Toast.makeText(mContext, "BokehFied", Toast.LENGTH_LONG).show()
             pendingIntentResult.success("success")
+        } else {
+            Toast.makeText(mContext, "The Image doesn't exists", Toast.LENGTH_LONG).show()
+            pendingIntentResult.success("failure")
         }
     }
 }

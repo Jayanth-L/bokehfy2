@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 
+/**
+ * author: Jayanrh L
+ * email: jayanthl@protonmail.com
+ */
+
 class ProModePageClass {
   
   BuildContext context;
