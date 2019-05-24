@@ -16,7 +16,7 @@ class MyBokehfyApp extends StatelessWidget {
     return MaterialApp(
       title: "Intro slider",
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: ThemeData(primarySwatch: Colors.blue, fontFamily: "Raleway"),
       home: IntroSlider(),
     );
   }

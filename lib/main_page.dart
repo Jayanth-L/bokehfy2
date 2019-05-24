@@ -18,7 +18,7 @@ class BokehfyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Bokehfy",
-      theme: ThemeData(primarySwatch: Colors.blue, brightness: Brightness.light),
+      theme: ThemeData(primarySwatch: Colors.blue, brightness: Brightness.light, fontFamily: "Raleway"),
       home: BokehfyAppPage(),
     );
   }
