@@ -33,6 +33,7 @@ class _ChromePortraitPageClassState extends State<ChromePortraitPageClass> {
     return ListView(
       padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
       children: <Widget>[
+        Center(child: Text("This feature is still in BETA stage!", style: TextStyle(fontWeight: FontWeight.bold),),),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
@@ -209,14 +210,14 @@ class _ChromePortraitPageClassState extends State<ChromePortraitPageClass> {
           height: 15.0,
         ),
         GestureDetector(
-          child: imageWidget("assets/img5.jpg", "Chromifyed pics"),
+          child: imageWidget("assets/img9.jpg", "Chromifyed pics"),
           onTap: () {
             Navigator.of(context).push(MaterialPageRoute(
                 builder: (BuildContext context) => ChromifyImageViewPage()));
           },
         ),
         GestureDetector(
-          child: imageWidget("assets/img4.jpg", "Camera pics"),
+          child: imageWidget("assets/img10.jpg", "Camera pics"),
           onTap: () {
             Navigator.of(context).push(MaterialPageRoute(
                 builder: (BuildContext context) =>
@@ -224,7 +225,7 @@ class _ChromePortraitPageClassState extends State<ChromePortraitPageClass> {
           },
         ),
         GestureDetector(
-          child: imageWidget("assets/img2.jpg", "Everything you have!"),
+          child: imageWidget("assets/img11.jpg", "Everything you have!"),
           onTap: () {
             Navigator.of(context).push(MaterialPageRoute(
                 builder: (BuildContext context) =>

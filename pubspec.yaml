@@ -41,11 +41,17 @@ dev_dependencies:
 # The following section is specific to Flutter.
 flutter:
   assets:
-    - assets/img1.jpg
-    - assets/img2.jpg
-    - assets/img3.jpg
-    - assets/img4.jpg
-    - assets/img5.jpg
+#    - assets/img1.jpg
+#    - assets/img2.jpg
+#    - assets/img3.jpg
+#    - assets/img4.jpg
+#    - assets/img5.jpg
+    - assets/img6.jpg # Selfie Girl
+    - assets/img7.jpg # Monkey selfie
+    - assets/img8.jpg # Green shadow grass
+    - assets/img9.jpg # Cat BW
+    - assets/img10.jpg # Girl backwards selfie
+    - assets/img11.jpg # ParaGlider image
     # Flare assets
     - assets/success.flr
     - assets/fail.flr

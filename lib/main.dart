@@ -235,7 +235,7 @@ class _Page1State extends State<Page1> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Icon(Icons.card_giftcard, size: 100.0, color: Colors.black),
+            Icon(Icons.photo_filter, size: 100.0, color: Colors.black),
             Text(
               "BOKEHFY APP",
               style: TextStyle(fontSize: 17.0, color: Colors.black),
@@ -262,7 +262,7 @@ class _Page2State extends State<Page2> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Icon(Icons.local_car_wash, size: 100.0, color: Colors.black),
+            Icon(Icons.supervisor_account, size: 100.0, color: Colors.black),
             Text(
               "Magically convert to Portrait photos with AI",
               style: TextStyle(
@@ -333,9 +333,9 @@ class _Page3State extends State<Page3> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Icon(Icons.cake, size: 100.0, color: Colors.black),
+            Icon(Icons.face, size: 100.0, color: Colors.black),
             Text(
-              "Happy Birthday",
+              "Happy Bokehfying!!!",
               style: TextStyle(fontSize: 17.0, color: Colors.black),
             )
           ],

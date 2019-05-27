@@ -48,7 +48,7 @@ class AboutPageClass {
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(35.0)),
                             onPressed: () {
-                              _launchTheUrl("market://details?id=com.bitcryptorapp.jayanthl.bitcryptorapp");
+                              _launchTheUrl("market://details?id=com.aiportraitapp.jayanthl.bokehfyapp");
                             },
                           ),
                         )

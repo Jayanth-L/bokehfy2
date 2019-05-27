@@ -226,21 +226,21 @@ class _PortraitPageClassState extends State<PortraitPageClass> {
           height: 15.0,
         ),
         GestureDetector(
-          child: imageWidget("assets/img1.jpg", "Bokehfyed pics"),
+          child: imageWidget("assets/img8.jpg", "Bokehfyed pics"),
           onTap: () {
             Navigator.of(context).push(MaterialPageRoute(
                 builder: (BuildContext context) => ImageViewPage()));
           },
         ),
         GestureDetector(
-          child: imageWidget("assets/img2.jpg", "Camera pics"),
+          child: imageWidget("assets/img7.jpg", "Camera pics"),
           onTap: () {
             Navigator.of(context).push(MaterialPageRoute(
                 builder: (BuildContext context) => CameraImageViewPage()));
           },
         ),
         GestureDetector(
-          child: imageWidget("assets/img3.jpg", "Everything you have!"),
+          child: imageWidget("assets/img6.jpg", "Everything you have!"),
           onTap: () {
             Navigator.of(context).push(MaterialPageRoute(
                 builder: (BuildContext context) =>

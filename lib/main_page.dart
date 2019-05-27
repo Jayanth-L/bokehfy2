@@ -84,7 +84,28 @@ class _BokehfyAppPageState extends State<BokehfyAppPage> with AutomaticKeepAlive
           IconButton(
             icon: Icon(Icons.sentiment_very_satisfied),
             color: Colors.black,
-            onPressed: () {},
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                    title: Text("Welcome to BokehFy App"),
+                    content: Text("Hope you are satisfied with our app, we will be happy if you are!"),
+                    actions: <Widget>[
+                      MaterialButton(
+                        color: Colors.blue,
+                        child: Text("Rate Us :)", style: TextStyle(color: Colors.white),),
+                        onPressed: () {
+                          _launchUrl("market://details?id=com.aiportraitapp.jayanthl.bokehfyapp");
+                          Navigator.of(context).pop();
+                        },
+                      )
+                    ],
+                  );
+                }
+              );
+            },
           )
         ],
       ),
@@ -108,11 +129,11 @@ class _BokehfyAppPageState extends State<BokehfyAppPage> with AutomaticKeepAlive
           items: [
             BottomNavigationBarItem(
                 icon: Icon(Icons.person, color: Colors.blue,),
-                title: Text("Portrait", style: TextStyle(color: Colors.blue),),
+                title: Text("Portrait", style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),),
                 backgroundColor: Colors.white),
             BottomNavigationBarItem(
                 icon: Icon(Icons.colorize, color: Colors.green,),
-                title: Text("Highlight", style: TextStyle(color: Colors.green)),
+                title: Text("Highlight (BETA)", style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
                 backgroundColor: Colors.white),
             /*BottomNavigationBarItem(
                 icon: Icon(Icons.portrait, color: Colors.orange,),
@@ -120,7 +141,7 @@ class _BokehfyAppPageState extends State<BokehfyAppPage> with AutomaticKeepAlive
                 backgroundColor: Colors.white), */
             BottomNavigationBarItem(
                 icon: Icon(Icons.info, color: Colors.deepPurple,),
-                title: Text("About", style: TextStyle(color: Colors.deepPurple)),
+                title: Text("About", style: TextStyle(color: Colors.deepPurple, fontWeight: FontWeight.bold)),
                 backgroundColor: Colors.white)
           ]),
       body: AnimatedOpacity(
@@ -143,7 +164,7 @@ class _BokehfyAppPageState extends State<BokehfyAppPage> with AutomaticKeepAlive
       children: <Widget>[
         ListTile(
           leading: Icon(Icons.home, color: Colors.green,),
-          title: Text("About"),
+          title: Text("About", style: TextStyle(fontWeight: FontWeight.bold),),
           onTap: () {
             Navigator.of(context).pop();
             showDialog(
@@ -170,7 +191,7 @@ class _BokehfyAppPageState extends State<BokehfyAppPage> with AutomaticKeepAlive
         ),
         ListTile(
           leading: Icon(Icons.security, color: Colors.orange,),
-          title: Text("Privacy Policy"),
+          title: Text("Privacy Policy", style: TextStyle(fontWeight: FontWeight.bold),),
           onTap: () {
             Navigator.of(context).pop();
             Navigator.of(context).push(
@@ -182,20 +203,20 @@ class _BokehfyAppPageState extends State<BokehfyAppPage> with AutomaticKeepAlive
         ),
         ListTile(
           leading: Icon(Icons.share, color: Colors.blue,),
-          title: Text("Share App"),
+          title: Text("Share App", style: TextStyle(fontWeight: FontWeight.bold),),
           onTap: () {
             Navigator.of(context).pop();
-
-            Share.share("Checkout the AI Powered Bokeh converter app");
+            Share.share("Have your ever wondered having a dual camera on your phone and taking Portrait Mode Pictures ?\nIf so then you are at the right Place, this app helps you with that having only a Single Camera, Yes single Camera, You don't need to have a dual camera setup\n\nhttps://play.google.com/store/apps/details?id=com.aiportraitapp.jayanthl.bokehfyapp");
+            // Old Share Share.share("Checkout the AI Powered Bokeh converter app");
             // TODO:// Implement share app.
           },
         ),
         ListTile(
           leading: Icon(Icons.thumb_up, color: Colors.deepPurple),
-          title: Text("Rate us :)"),
+          title: Text("Rate us :)", style: TextStyle(fontWeight: FontWeight.bold),),
           onTap: () {
             Navigator.of(context).pop();
-            _launchUrl("market://details?id=com.bitcryptorapp.jayanthl.bitcryptorapp");
+            _launchUrl("market://details?id=com.aiportraitapp.jayanthl.bokehfyapp");
           },
         )
       ],
