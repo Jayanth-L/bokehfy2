@@ -7,7 +7,8 @@ description: A new Flutter project.
 # Both the version and the builder number may be overridden in flutter
 # build by specifying --build-name and --build-number, respectively.
 # Read more about versioning at semver.org.
-version: 1.0.0+1
+# Versioning even for 64 bit releases odd for 32 bit releases
+version: 1.0.0+4
 
 environment:
   sdk: ">=2.0.0-dev.68.0 <3.0.0"
@@ -56,6 +57,8 @@ flutter:
     - assets/success.flr
     - assets/fail.flr
     - assets/line_circles.flr
+    # Deeplab V3 License text
+    - assets/DEEPLAB_V3_LICENSE # Deeplab V3 Apache 2.0 license
   
 
 
