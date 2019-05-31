@@ -1,5 +1,8 @@
 package com.aiportraitapp.jayanthl.bokehfyapp
 
+import com.facebook.FacebookSdk
+import com.facebook.appevents.AppEventsLogger
+
 import android.app.Activity
 import android.content.Intent
 import android.content.Context
@@ -45,6 +48,8 @@ import kotlin.math.max
 
 class MainActivity: FlutterActivity() {
 
+    lateinit var logger: AppEventsLogger
+
     var mCurrentPhotoPath: String = ""
 
     val PICK_IMAGE_FOR_PORTRAIT_REQUESTCODE = 101
@@ -85,6 +90,8 @@ class MainActivity: FlutterActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         GeneratedPluginRegistrant.registerWith(this)
+
+        logger = AppEventsLogger.newLogger(this)
 
 
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME)
@@ -655,6 +662,7 @@ class MainActivity: FlutterActivity() {
 
         Imgcodecs.imwrite(saveDirectory + Date().time.toString() + ".png", finalImage)
         resultData.rewind()
+        logger.logEvent("bokehConversion");
     }
 
     fun aiConvertToMonoChrome(imagePath: String, saveDirectory: String) {
@@ -736,6 +744,7 @@ class MainActivity: FlutterActivity() {
 
         Imgcodecs.imwrite(saveDirectory + Date().time.toString() + ".png", finalImage)
         resultData.rewind()
+        logger.logEvent("colorConversion")
     }
 
     // Function to watermark an image

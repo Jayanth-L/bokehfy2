@@ -102,6 +102,7 @@ dependencies {
     implementation project(':openCV401')
 
     implementation 'org.tensorflow:tensorflow-lite:+'
+    implementation 'com.facebook.android:facebook-android-sdk:[5,6)'
 
 }
 
