@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:bokehfyapp/widgets/image_viewer.dart';
 import 'package:bokehfyapp/widgets/camera_imageviewer.dart';
@@ -68,7 +69,7 @@ class _PortraitPageClassState extends State<PortraitPageClass> {
                       // Now send it for the bokehfycation
 
                       // show the dialog
-                      if (_ != "") {
+                      if (_ != "" && File(_).existsSync()) {
                         showDialog(
                             context: context,
                             builder: (BuildContext context) {
@@ -115,9 +116,13 @@ class _PortraitPageClassState extends State<PortraitPageClass> {
                                                         Navigator.of(
                                                                 successContext)
                                                             .pop();
+                                                        _launchImageGallery();
+                                                        _response = "";
+                                                        isLoadingflareanimation = true;
                                                       },
                                                     );
                                                   });
+                                              
                                             } else {
                                               try {
                                                 Navigator.of(context).pop();
@@ -150,6 +155,8 @@ class _PortraitPageClassState extends State<PortraitPageClass> {
                                 ],
                               );
                             });
+                      } else {
+                        platform.invokeMethod("toastMessage", {"message": "Please select a valid image :)"});
                       }
                     });
                   },
@@ -181,9 +188,13 @@ class _PortraitPageClassState extends State<PortraitPageClass> {
                   onTap: () {
                     showDialog(
                       builder: (BuildContext context) {
-                        _getCameraImageToPortraitAndPortrify().then((_) {
+                        _getCameraImageToPortraitAndPortrify().then((_succ) {
                           Navigator.of(context).pop();
-                          if (_ == "success") {
+                          isLoadingflareanimation = true;
+                          if (_succ == "success") {
+                            setState(() {
+                              isLoadingflareanimation = false;
+                            });
                             showDialog(
                                 context: context,
                                 barrierDismissible: false,
@@ -191,12 +202,16 @@ class _PortraitPageClassState extends State<PortraitPageClass> {
                                   return FlareActor(
                                     'assets/success.flr',
                                     animation: "Untitled",
-                                    callback: (_) {
+                                    callback: (_call) {
                                       print("Success animation done");
                                       Navigator.of(successContext).pop();
+                                      _launchCameraGallery();
+                                      _succ = "";
+                                      isLoadingflareanimation = true;
                                     },
                                   );
                                 });
+                           
                           }
                         });
                         return FlareActor(
@@ -341,5 +356,15 @@ class _PortraitPageClassState extends State<PortraitPageClass> {
     var response = await platform.invokeMethod(
         "sendCameraImageForBokehfycation", {"imagepath": imagepath});
     return response;
+  }
+
+  Future _launchImageGallery() {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (BuildContext context) => ImageViewPage()));
+  }
+
+  Future _launchCameraGallery() {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (BuildContext context) => CameraImageViewPage()));
   }
 }

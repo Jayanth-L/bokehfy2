@@ -270,7 +270,7 @@ class _Page2State extends State<Page2> {
                 color: Colors.black,
               ),
             ),
-            MaterialButton(
+            RaisedButton(
               child: Text(
                 "Give Permission",
                 style: TextStyle(color: Colors.black),

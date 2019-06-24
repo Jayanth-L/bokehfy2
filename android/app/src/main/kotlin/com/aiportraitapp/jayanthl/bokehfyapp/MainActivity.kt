@@ -366,6 +366,11 @@ class MainActivity: FlutterActivity() {
                     result.success("failure")
                 }
             }
+
+            else if (methodCall.method.equals("toastMessage")) {
+                val message = arguments.get("message").toString()
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+            }
         }
 
     }

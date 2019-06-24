@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:bokehfyapp/widgets/image_viewer.dart';
 import 'package:flutter/services.dart';
@@ -66,7 +68,7 @@ class _ChromePortraitPageClassState extends State<ChromePortraitPageClass> {
                       // Now send it for the bokehfycation
 
                       // show the dialog
-                      if (_ != "") {
+                      if (_ != "" && File(_).existsSync()) {
                         showDialog(
                             context: context,
                             builder: (BuildContext context) {
@@ -109,6 +111,7 @@ class _ChromePortraitPageClassState extends State<ChromePortraitPageClass> {
                                                         Navigator.of(
                                                                 successContext)
                                                             .pop();
+                                                        _launchImageGallery();
                                                       },
                                                     );
                                                   });
@@ -140,6 +143,8 @@ class _ChromePortraitPageClassState extends State<ChromePortraitPageClass> {
                                 ],
                               );
                             });
+                      } else {
+                        platform.invokeMethod("toastMessage", {"message": "Please select a valid image :)"});
                       }
                     });
                   },
@@ -184,6 +189,7 @@ class _ChromePortraitPageClassState extends State<ChromePortraitPageClass> {
                                     callback: (_) {
                                       print("Success animation done");
                                       Navigator.of(successContext).pop();
+                                      _launchCameraGallery();
                                     },
                                   );
                                 });
@@ -325,5 +331,16 @@ class _ChromePortraitPageClassState extends State<ChromePortraitPageClass> {
     var response = await platform.invokeMethod(
         "sendCameraImageForChromification", {"imagepath": imagepath});
     return response;
+  }
+
+  Future _launchImageGallery() {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (BuildContext context) => ChromifyImageViewPage()));
+  }
+
+  Future _launchCameraGallery() {
+    Navigator.of(context).push(MaterialPageRoute(
+                builder: (BuildContext context) =>
+                    CameraChromifyImageViewPage()));
   }
 }
