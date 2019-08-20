@@ -148,15 +148,11 @@ class _IntroSliderState extends State<IntroSlider> {
                                 context: context,
                                 barrierDismissible: false,
                                 builder: (BuildContext progressContext) {
-                                  _decryptTensorflowModel().then((_) {
-                                    if (_ == "success") {
-                                      Navigator.of(context).pop();
+                                  Navigator.of(context).pop();
                                       Navigator.of(context).pushReplacement(
                                           MaterialPageRoute(
                                               builder: (BuildContext context) =>
                                                   BokehfyApp()));
-                                    }
-                                  });
                                   return Center(
                                       child: Container(
                                     child: CircularProgressIndicator(),
@@ -179,12 +175,6 @@ class _IntroSliderState extends State<IntroSlider> {
     } else {
       return BokehfyApp();
     }
-  }
-
-  Future<String> _decryptTensorflowModel() async {
-    var res = await platform
-        .invokeMethod("decryptTensorflowModel", {"decrypt": "decrypt"});
-    return res;
   }
 
   Future<String> _checkPermission() async {

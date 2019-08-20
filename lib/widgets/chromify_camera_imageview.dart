@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:photo_view/photo_view_gallery.dart';
 
 /**
  * author: Jayanrh L
@@ -16,7 +15,6 @@ class CameraChromifyImageViewPage extends StatefulWidget {
 class _CameraChromifyImageViewPageState extends State<CameraChromifyImageViewPage> {
   static final platform = MethodChannel("BokehfyImage");
   List bokehImagesList = List<String>();
-  var image = <PhotoViewGalleryPageOptions>[];
 
   @override
   void initState() {

@@ -84,6 +84,9 @@ class MainActivity: FlutterActivity() {
     val cameraColorHighlightDirectory = colorHighlightDirectory + "/Camera/"
     val imageColorHighlightDirectory = colorHighlightDirectory + "/Images/"
 
+    var REAL_HEIGHT = 0
+    var REAL_WIDTH = 0
+
 
 
     lateinit var pendingIntentnResult: MethodChannel.Result
@@ -306,22 +309,6 @@ class MainActivity: FlutterActivity() {
                 }
             }
 
-            else if(methodCall.method.equals("decryptTensorflowModel")) {
-                if(!File(this.filesDir, "tflite_model.tflite").exists()) {
-
-                    AsyncHandler({
-
-                        val fileDescriptor: AssetFileDescriptor= assets.openFd("tflite_model_v1.tflite.enc")
-                        val fileInputStream = fileDescriptor.createInputStream()
-                        decryptModelFile(fileInputStream, "lkench5@")
-                        return@AsyncHandler true
-                    }, this, result).execute()
-                } else {
-                    Toast.makeText(this, "File already exists", Toast.LENGTH_LONG).show()
-                    result.success("success")
-                }
-            }
-
             else if(methodCall.method.equals("isFirstTimeAndCheckPermission")) {
                 var firstTime: Boolean
                 var isPermissionNotGranted: Boolean
@@ -469,54 +456,15 @@ class MainActivity: FlutterActivity() {
     }
 
 
-    fun decryptModelFile(fileInputStream: FileInputStream, password: String): Boolean {
-        try {
-            val decryptedFileOutputStream = FileOutputStream(File(filesDir, "tflite_model.tflite"))
-            var key = password.toByteArray(charset("UTF-8"))
-            val sha1sum = MessageDigest.getInstance("SHA-1")
-            key = sha1sum.digest(key)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-                key = Arrays.copyOf(key, 16)
-            }
-            val secretKeySpec = SecretKeySpec(key, "AES")
-            val cipher = Cipher.getInstance("AES")
-            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec)
-            val cipherInputStream = CipherInputStream(fileInputStream, cipher)
-            var bytes: Int
-            val datasize = ByteArray(64)
-            var filevalue = 0
-            bytes = cipherInputStream.read(datasize)
-            while (bytes != -1) {
-                // Log.i("Bytes", "size: $bytes")
-                filevalue = filevalue + bytes
-                decryptedFileOutputStream.write(datasize, 0, bytes)
-                bytes = cipherInputStream.read(datasize)
-            }
-            Log.i("Total read bytes", "" + filevalue)
-            decryptedFileOutputStream.flush()
-            decryptedFileOutputStream.close()
-            cipherInputStream.close()
-
-            // Toast.makeText(this, "Model decrypted successfully", Toast.LENGTH_LONG).show()
-            //Toasty.success(this, "Successfully Decrypted", Toast.LENGTH_LONG, true).show()
-            Log.i("MainActivity.this", "Model file is decrypted successfully")
-            return true
-        } catch (e: Exception) {
-            Log.i("MainActivity.this", "Couldn't not be decrypted")
-            // Toast.makeText(this, "Sorry, couldn't decrypt the model, try again!!!", Toast.LENGTH_LONG).show()
-            e.printStackTrace()
-            return false
-        }
-    }
 
     fun resizematrix(image: Mat): Mat {
         val width = image.width()
         val height = image.height()
 
-        val resizeRatio = 1.0 * RESIZE_SIZE / max(height, width)
+        /*val resizeRatio = 1.0 * RESIZE_SIZE / max(height, width)
         val targetSizeheight = (resizeRatio * height).toInt()
-        val targetSizeWidth = (resizeRatio * width).toInt()
-        val size = Size(targetSizeWidth.toDouble(), targetSizeheight.toDouble())
+        val targetSizeWidth = (resizeRatio * width).toInt()*/
+        val size = Size(RESIZE_SIZE.toDouble(), RESIZE_SIZE.toDouble())
         Imgproc.resize(image, image, size)
         return image
     }
@@ -591,9 +539,13 @@ class MainActivity: FlutterActivity() {
 
     fun aiConvertToPortrait(imagePath: String, saveDirectory: String) {
         var image = Imgcodecs.imread(imagePath)
+        this.REAL_WIDTH = image.width()
+        this.REAL_HEIGHT = image.height()
         image = resizematrix(image)
 
         Log.i("PaddingOffset", "width: ${image.width()} and height: ${image.height()}")
+
+        /*
 
         if(image.width() < image.height()) {
             this.paddingOffset = image.height() - image.width()
@@ -603,7 +555,7 @@ class MainActivity: FlutterActivity() {
             this.paddingOffset = image.width() - image.height()
             image = paddImage(image, false)
             isPortrait = "false"
-        }
+        } */
 
         val interpreterBitmap: Bitmap = Bitmap.createBitmap(RESIZE_SIZE, RESIZE_SIZE, Bitmap.Config.ARGB_4444)
         Utils.matToBitmap(image, interpreterBitmap)
@@ -615,15 +567,24 @@ class MainActivity: FlutterActivity() {
 
         try {
             if(isTensorflowInitialized) {
+                resultData.rewind()
                 Log.i("Tensorflow", "Tensorflow model was loaded already")
                 tensorflowInterpreter.run(floatArray, resultData)
             } else {
-                tensorflowInterpreter = Interpreter(File(filesDir, "tflite_model.tflite"))
+                resultData.rewind()
+                val fileDescriptor = assets.openFd("ai_portrait.tflite")
+                val fis = FileInputStream(fileDescriptor.fileDescriptor)
+                val fileChannel = fis.channel
+                val startOffSet = fileDescriptor.startOffset
+                val declaredLength = fileDescriptor.declaredLength
+                val mappedByteBuffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffSet, declaredLength)
+                tensorflowInterpreter = Interpreter(mappedByteBuffer)
                 tensorflowInterpreter.run(floatArray, resultData)
                 Log.i("Tensorflow", "Tensorflow model loaded successfully")
                 isTensorflowInitialized = true
             }
         } catch (e: Exception) {
+            e.printStackTrace()
             Log.i("Tensorflow", "There was a problem in loading tensorflow")
             isTensorflowInitialized = false
         }
@@ -660,22 +621,34 @@ class MainActivity: FlutterActivity() {
 
         // Unpadd the Image
         Log.i("PaddingOffset", this.paddingOffset.toString())
-        var finalImage = removePaddingOfImage(finalBokehImageWithoutCrop, this.paddingOffset, isPortrait)
+        Log.i("Postprocess", "${finalBokehImageWithoutCrop.width()} and ${finalBokehImageWithoutCrop.height()}")
+        Log.i("PostprocessW", "${REAL_HEIGHT} and ${REAL_WIDTH}")
 
         // Sample apply watermark
-        finalImage = HelperFunctions().applyWatermarkToImage(finalImage)
+        finalBokehImageWithoutCrop = restoreSize(finalBokehImageWithoutCrop, REAL_WIDTH, REAL_HEIGHT)
+        val finalImage = HelperFunctions().applyWatermarkToImage(finalBokehImageWithoutCrop)
 
         Imgcodecs.imwrite(saveDirectory + Date().time.toString() + ".png", finalImage)
         resultData.rewind()
         logger.logEvent("bokehConversion");
     }
 
+    fun restoreSize(image: Mat, orig_width: Int, orig_height: Int): Mat {
+        val size = Size(orig_width.toDouble(), orig_height.toDouble())
+        Imgproc.resize(image, image, size)
+        return image
+    }
+
+
     fun aiConvertToMonoChrome(imagePath: String, saveDirectory: String) {
         var image = Imgcodecs.imread(imagePath)
+        this.REAL_WIDTH = image.width()
+        this.REAL_HEIGHT = image.height()
         image = resizematrix(image)
 
         Log.i("PaddingOffset", "width: ${image.width()} and height: ${image.height()}")
 
+        /*
         if(image.width() < image.height()) {
             this.paddingOffset = image.height() - image.width()
             image = paddImage(image, true)
@@ -684,7 +657,7 @@ class MainActivity: FlutterActivity() {
             this.paddingOffset = image.width() - image.height()
             image = paddImage(image, false)
             isPortrait = "false"
-        }
+        } */
 
         val interpreterBitmap: Bitmap = Bitmap.createBitmap(RESIZE_SIZE, RESIZE_SIZE, Bitmap.Config.ARGB_4444)
         Utils.matToBitmap(image, interpreterBitmap)
@@ -696,15 +669,24 @@ class MainActivity: FlutterActivity() {
         try {
             if(isTensorflowInitialized) {
                 Log.i("Tensorflow", "Tensorflow model was loaded already")
+                resultData.rewind()
                 tensorflowInterpreter.run(floatArray, resultData)
 
             } else {
-                tensorflowInterpreter = Interpreter(File(filesDir, "tflite_model.tflite"))
+                resultData.rewind()
+                val fileDescriptor = assets.openFd("ai_portrait.tflite")
+                val fis = FileInputStream(fileDescriptor.fileDescriptor)
+                val fileChannel = fis.channel
+                val startOffSet = fileDescriptor.startOffset
+                val declaredLength = fileDescriptor.declaredLength
+                val mappedByteBuffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffSet, declaredLength)
+                tensorflowInterpreter = Interpreter(mappedByteBuffer)
                 tensorflowInterpreter.run(floatArray, resultData)
                 Log.i("Tensorflow", "Tensorflow model loaded successfully")
                 isTensorflowInitialized = true
             }
         } catch (e: Exception) {
+            e.printStackTrace()
             Log.i("Tensorflow", "There was a problem in loading tensorflow")
             isTensorflowInitialized = false
         }
@@ -742,16 +724,14 @@ class MainActivity: FlutterActivity() {
 
         // Unpadd the Image
         Log.i("PaddingOffset", this.paddingOffset.toString())
-        var finalImage = removePaddingOfImage(finalBokehImageWithoutCrop, this.paddingOffset, isPortrait)
 
         // Sample watermark testing
-        finalImage = HelperFunctions().applyWatermarkToImage(finalImage)
+        finalBokehImageWithoutCrop = restoreSize(finalBokehImageWithoutCrop, REAL_WIDTH, REAL_HEIGHT)
+        val finalImage = HelperFunctions().applyWatermarkToImage(finalBokehImageWithoutCrop)
 
         Imgcodecs.imwrite(saveDirectory + Date().time.toString() + ".png", finalImage)
         resultData.rewind()
         logger.logEvent("colorConversion")
     }
-
     // Function to watermark an image
-
 }

@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:photo_view/photo_view_gallery.dart';
 
 /**
  * author: Jayanrh L
@@ -16,7 +15,6 @@ class ImageViewPage extends StatefulWidget {
 class _ImageViewPageState extends State<ImageViewPage> {
   static final platform = MethodChannel("BokehfyImage");
   List bokehImagesList = List<String>();
-  var image = <PhotoViewGalleryPageOptions>[];
 
   @override
   void initState() {

@@ -1,4 +1,4 @@
-Executable : /home/jayanthl/Android/android-ndk/android-ndk-r19c/ndk-build
+Executable : /home/jayanthl/Android/android-ndk/android-ndk-r20/ndk-build
 arguments : 
 NDK_PROJECT_PATH=null
 APP_BUILD_SCRIPT=/run/media/jayanthl/Data_partition/.projs/.opencv_android/OpenCV-android-sdk/sdk/native/jni/OpenCV.mk
